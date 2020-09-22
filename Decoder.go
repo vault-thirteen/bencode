@@ -97,7 +97,6 @@ func (d Decoder) readBencodedValue() (result interface{}, err error) {
 
 		// Read the Byte String.
 		return d.readByteString(ByteStringMaxLength)
-
 	}
 
 	// Otherwise, it is a Syntax Error.
@@ -113,7 +112,8 @@ func (d Decoder) readByteString(
 
 	// Read the Size Header and verify it.
 	var byteStringLen uint
-	byteStringLen, err = d.readByteStringSizeHeader(byteStringMaxLen)
+	var byteStringSizeHeaderMaxLen int = getByteStringSizeHeaderMaxLen(uint(byteStringMaxLen))
+	byteStringLen, err = d.readByteStringSizeHeader(byteStringSizeHeaderMaxLen)
 	if err != nil {
 		return
 	}
@@ -128,25 +128,26 @@ func (d Decoder) readByteString(
 		// Read next Symbol.
 		b, err = d.reader.ReadByte()
 		if err != nil {
-			return ba, err
+			return
 		}
 
 		// Save the Byte to the Accumulator.
 		err = bytesAccumulator.WriteByte(b)
 		if err != nil {
-			return ba, err
+			return
 		}
 
 		i++
 	}
 
-	return bytesAccumulator.Bytes(), nil
+	ba = bytesAccumulator.Bytes()
+	return
 }
 
 // Reads the Size Header of a Byte String from the Stream (Reader) and
 // converts its Value into an Integer.
 func (d Decoder) readByteStringSizeHeader(
-	byteStringMaxLen int,
+	byteStringSizeHeaderMaxLen int,
 ) (byteStringLen uint, err error) {
 
 	// Read the first Byte.
@@ -167,7 +168,7 @@ func (d Decoder) readByteStringSizeHeader(
 		}
 
 		// Save Byte to Size Header.
-		if len(sizeHeader) < byteStringMaxLen {
+		if len(sizeHeader) < byteStringSizeHeaderMaxLen {
 			sizeHeader = append(sizeHeader, b)
 		} else {
 			// The Length Header is too big!
@@ -212,7 +213,7 @@ func (d Decoder) readDictionary() (result interface{}, err error) {
 	var b byte
 	b, err = d.reader.ReadByte()
 	if err != nil {
-		return nil, err
+		return
 	}
 	for b != FooterCommon {
 
@@ -220,21 +221,21 @@ func (d Decoder) readDictionary() (result interface{}, err error) {
 		// We must get back, rewind that Byte.
 		err = d.reader.UnreadByte()
 		if err != nil {
-			return nil, err
+			return
 		}
 
 		// Get the Key.
 		var dictKey []byte
 		dictKey, err = d.readDictionaryKey()
 		if err != nil {
-			return nil, err
+			return
 		}
 
 		// Get the Value.
 		var dictValue interface{}
 		dictValue, err = d.readDictionaryValue()
 		if err != nil {
-			return nil, err
+			return
 		}
 
 		// Save Item into Dictionary.
@@ -254,11 +255,12 @@ func (d Decoder) readDictionary() (result interface{}, err error) {
 		// Probe the Next Byte to check the End of Dictionary.
 		b, err = d.reader.ReadByte()
 		if err != nil {
-			return nil, err
+			return
 		}
 	}
 
-	return dictionary, nil
+	result = dictionary
+	return
 }
 
 // Reads a Dictionary's Key.

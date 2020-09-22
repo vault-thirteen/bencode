@@ -81,6 +81,15 @@ func convertInterfaceToString(
 	return
 }
 
+// Calculates how many numeric Symbols are required to write the Size Prefix.
+func getByteStringSizeHeaderMaxLen(
+	byteStringLen uint,
+) (byteStringSizeHeaderMaxLen int) {
+	s := strconv.FormatUint(uint64(byteStringLen), 10)
+	byteStringSizeHeaderMaxLen = len([]rune(s))
+	return
+}
+
 // Checks whether the Byte is ASCII numeric Symbol.
 // Negative Numbers are possible.
 func isByteAsciiNumeric(

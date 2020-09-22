@@ -34,7 +34,7 @@ const (
 	ErrByteStringToIntError     = "Byte String to Integer Conversion Error"
 	ErrDataTypeError            = "Unsupported Type"
 	ErrHeaderLengthError        = "The Length Header is too big"
-	ErrIntegerLengthError       = "The Integeris too big"
+	ErrIntegerLengthError       = "The Integer is too big"
 	ErrSectionDoesNotExistError = "Section does not exist"
 	ErrSelfCheckError           = "Self-Check Error"
 	ErrTypeAssertionError       = "Type Assertion Error"
