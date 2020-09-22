@@ -15,7 +15,9 @@
 //
 //============================================================================//
 //
-// Web Site:		'https://github.com/legacy-vault'.
+// Web Sites:		'https://github.com/neverwinter-nights',
+//					'https://github.com/vault-thirteen',
+//					'https://github.com/legacy-vault'.
 // Author:			McArcher.
 // Web Site Address is an Address in the global Computer Internet Network.
 //
@@ -76,7 +78,7 @@ func (e Encoder) addPrefixAndPostfixOfByteString(
 		e.createSizePrefix(
 			uint64(len(tmpResult)),
 		),
-		result...,
+		tmpResult...,
 	)
 	return
 }

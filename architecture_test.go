@@ -1,4 +1,4 @@
-// architecture.go.
+// architecture_test.go.
 
 //============================================================================//
 //
@@ -23,43 +23,12 @@
 //
 //============================================================================//
 
-// Architecture specific Methods.
-
 package bencode
 
 import (
-	"math"
-	"strconv"
-)
-
-const (
-	ArchitectureIs64Bit bool = (strconv.IntSize == 64)
-	ArchitectureIs32Bit bool = (strconv.IntSize == 32)
+	"testing"
 )
 
 // Checks whether the unsigned Integer is able to be converted into 'int' Type.
-func isUint64ConvertibleToInt(
-	number uint64,
-) bool {
-
-	// 64-bit CPU Architecture.
-	if ArchitectureIs64Bit {
-
-		if number <= math.MaxInt64 {
-			return true
-		}
-		return false
-	}
-
-	// 32-bit CPU Architecture.
-	if ArchitectureIs32Bit {
-
-		if number <= math.MaxInt32 {
-			return true
-		}
-		return false
-	}
-
-	// UnKnown CPU Architecture.
-	return false
+func Test_isUint64ConvertibleToInt(t *testing.T) {
 }
