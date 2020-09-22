@@ -15,9 +15,7 @@
 //
 //============================================================================//
 //
-// Web Sites:		'https://github.com/neverwinter-nights',
-//					'https://github.com/vault-thirteen',
-//					'https://github.com/legacy-vault'.
+// Web Site:		'https://github.com/neverwinter-nights'.
 // Author:			McArcher.
 // Web Site Address is an Address in the global Computer Internet Network.
 //
