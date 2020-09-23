@@ -37,9 +37,8 @@ import (
 // N.B.: Maximum Value of UInt64 is '18446744073709551615'.
 const IntegerMaxLength = 20
 
-//	1.2.	Byte String Size Header (Number of ASCII Letters allowed).
-// N.B.: We are not going to read Byte Strings which have Length more than that.
-const ByteStringMaxLength = IntegerMaxLength
+//	1.2.	Byte String Size Header Length (Number of ASCII Letters allowed).
+const ByteStringSizeHeaderMaxLength = IntegerMaxLength
 
 // A 'bencode' Decoder.
 type Decoder struct {
@@ -80,7 +79,7 @@ func (d Decoder) readBencodedValue() (result interface{}, err error) {
 		return d.readList()
 
 	} else if b == HeaderInteger {
-		return d.readInteger(IntegerMaxLength)
+		return d.readInteger()
 
 	} else if isByteNonNegativeAsciiNumeric(b) {
 		// It must be an ASCII Number indicating a Byte String.
@@ -94,7 +93,7 @@ func (d Decoder) readBencodedValue() (result interface{}, err error) {
 		}
 
 		// Read the Byte String.
-		return d.readByteString(ByteStringMaxLength)
+		return d.readByteString()
 	}
 
 	// Otherwise, it is a Syntax Error.
@@ -104,14 +103,11 @@ func (d Decoder) readBencodedValue() (result interface{}, err error) {
 }
 
 // Reads a Byte String from the Stream (Reader).
-func (d Decoder) readByteString(
-	byteStringMaxLen int,
-) (ba []byte, err error) {
+func (d Decoder) readByteString() (ba []byte, err error) {
 
 	// Read the Size Header and verify it.
 	var byteStringLen uint
-	var byteStringSizeHeaderMaxLen int = getByteStringSizeHeaderMaxLen(uint(byteStringMaxLen))
-	byteStringLen, err = d.readByteStringSizeHeader(byteStringSizeHeaderMaxLen)
+	byteStringLen, err = d.readByteStringSizeHeader()
 	if err != nil {
 		return
 	}
@@ -144,9 +140,7 @@ func (d Decoder) readByteString(
 
 // Reads the Size Header of a Byte String from the Stream (Reader) and
 // converts its Value into an Integer.
-func (d Decoder) readByteStringSizeHeader(
-	byteStringSizeHeaderMaxLen int,
-) (byteStringLen uint, err error) {
+func (d Decoder) readByteStringSizeHeader() (byteStringLen uint, err error) {
 
 	// Read the first Byte.
 	var b byte
@@ -166,11 +160,15 @@ func (d Decoder) readByteStringSizeHeader(
 		}
 
 		// Save Byte to Size Header.
-		if len(sizeHeader) < byteStringSizeHeaderMaxLen {
+		if len(sizeHeader) < ByteStringSizeHeaderMaxLength {
 			sizeHeader = append(sizeHeader, b)
 		} else {
 			// The Length Header is too big!
-			err = ErrHeaderLength
+			var errorArea []byte = append(sizeHeader, []byte{b}...)
+			err = fmt.Errorf(
+				ErrHeaderLengthError,
+				errorArea,
+			)
 			return
 		}
 
@@ -263,7 +261,7 @@ func (d Decoder) readDictionary() (result interface{}, err error) {
 
 // Reads a Dictionary's Key.
 func (d Decoder) readDictionaryKey() ([]byte, error) {
-	return d.readByteString(ByteStringMaxLength)
+	return d.readByteString()
 }
 
 // Reads a Dictionary's Value.
@@ -274,9 +272,7 @@ func (d Decoder) readDictionaryValue() (interface{}, error) {
 // Reads an Integer from the Stream (Reader).
 // We suppose that the Header of Integer ('i')
 // has already been read from the Stream.
-func (d Decoder) readInteger(
-	integerMaxLen int,
-) (value int64, err error) {
+func (d Decoder) readInteger() (value int64, err error) {
 
 	// Prepare Data.
 	var valueBA []byte = []byte{}
@@ -298,11 +294,15 @@ func (d Decoder) readInteger(
 		}
 
 		// Save Byte to Value Byte Array.
-		if len(valueBA) < integerMaxLen {
+		if len(valueBA) < IntegerMaxLength {
 			valueBA = append(valueBA, b)
 		} else {
 			// The Integer is too big!
-			err = ErrIntegerLength
+			var errorArea []byte = append(valueBA, []byte{b}...)
+			err = fmt.Errorf(
+				ErrfIntegerLengthError,
+				errorArea,
+			)
 			return
 		}
 

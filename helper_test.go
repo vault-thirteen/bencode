@@ -82,15 +82,6 @@ func Test_convertInterfaceToString(t *testing.T) {
 	aTest.MustBeEqual(result, "Text")
 }
 
-func Test_getByteStringSizeHeaderMaxLen(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
-
-	// Test #1.
-	var result int
-	result = getByteStringSizeHeaderMaxLen(uint(12345))
-	aTest.MustBeEqual(result, 5)
-}
-
 func Test_isByteAsciiNumeric(t *testing.T) {
 	var aTest *tester.Test = tester.New(t)
 

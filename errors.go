@@ -27,24 +27,23 @@ package bencode
 
 import "errors"
 
-// Error Messages.
+// Error Messages and Formats.
 const (
 	ErrByteStringToIntError     = "Byte String to Integer Conversion Error"
 	ErrDataTypeError            = "Unsupported Type"
-	ErrHeaderLengthError        = "The Length Header is too big"
-	ErrIntegerLengthError       = "The Integer is too big"
 	ErrSectionDoesNotExistError = "Section does not exist"
 	ErrSelfCheckError           = "Self-Check Error"
 	ErrTypeAssertionError       = "Type Assertion Error"
 	ErrFileNotInitializedError  = "File is not initialized"
+	//
+	ErrfIntegerLengthError = "The Integer is too big: %v"
+	ErrHeaderLengthError   = "The Length Header is too big: %v"
 )
 
 // Cached Errors.
 var (
 	ErrByteStringToInt     = errors.New(ErrByteStringToIntError)
 	ErrDataType            = errors.New(ErrDataTypeError)
-	ErrHeaderLength        = errors.New(ErrHeaderLengthError)
-	ErrIntegerLength       = errors.New(ErrIntegerLengthError)
 	ErrSectionDoesNotExist = errors.New(ErrSectionDoesNotExistError)
 	ErrSelfCheck           = errors.New(ErrSelfCheckError)
 	ErrTypeAssertion       = errors.New(ErrTypeAssertionError)

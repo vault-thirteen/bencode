@@ -148,7 +148,6 @@ func Test_readByteString(t *testing.T) {
 
 	var aTest *tester.Test = tester.New(t)
 	var tests []TestData
-	var byteStringMaxLen int = 100
 
 	// Test #1. Negative: Bad Size Header.
 	tests = append(tests, TestData{
@@ -187,7 +186,7 @@ func Test_readByteString(t *testing.T) {
 	for i, test := range tests {
 		fmt.Printf("Test #%v.\r\n", i+1)
 		decoder := NewDecoder(test.reader)
-		result, err := decoder.readByteString(byteStringMaxLen)
+		result, err := decoder.readByteString()
 		if test.isErrorExpected {
 			aTest.MustBeAnError(err)
 			fmt.Println(err)
@@ -208,7 +207,6 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 
 	var aTest *tester.Test = tester.New(t)
 	var tests []TestData
-	var byteStringSizeHeaderMaxLen int = 2
 
 	// Test #1. Negative: No Data.
 	tests = append(tests, TestData{
@@ -221,7 +219,7 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 		expectedResult:  nil,
 	})
 
-	// Test #2. Negative: bad Symbol.
+	// Test #2. Negative: Bad Symbol.
 	tests = append(tests, TestData{
 		reader: bufio.NewReader(
 			strings.NewReader(
@@ -236,7 +234,7 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 	tests = append(tests, TestData{
 		reader: bufio.NewReader(
 			strings.NewReader(
-				"12345:qwerty",
+				"123456789012345678901:qwerty", // 21 Symbol in Size Header.
 			),
 		),
 		isErrorExpected: true,
@@ -278,7 +276,7 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 	for i, test := range tests {
 		fmt.Printf("Test #%v.\r\n", i+1)
 		decoder := NewDecoder(test.reader)
-		result, err := decoder.readByteStringSizeHeader(byteStringSizeHeaderMaxLen)
+		result, err := decoder.readByteStringSizeHeader()
 		if test.isErrorExpected {
 			aTest.MustBeAnError(err)
 			fmt.Println(err)
@@ -400,7 +398,6 @@ func Test_readInteger(t *testing.T) {
 
 	var aTest *tester.Test = tester.New(t)
 	var tests []TestData
-	var integerMaxLen int = 4
 
 	// Test #1. Negative: No Data.
 	tests = append(tests, TestData{
@@ -410,7 +407,6 @@ func Test_readInteger(t *testing.T) {
 			),
 		),
 		isErrorExpected: true,
-		expectedResult:  nil,
 	})
 
 	// Test #2. Negative: Bad Data.
@@ -421,7 +417,6 @@ func Test_readInteger(t *testing.T) {
 			),
 		),
 		isErrorExpected: true,
-		expectedResult:  nil,
 	})
 
 	// Test #3. Positive: Normal Data.
@@ -439,11 +434,10 @@ func Test_readInteger(t *testing.T) {
 	tests = append(tests, TestData{
 		reader: bufio.NewReader(
 			strings.NewReader(
-				"12345e", // Without 'i' Prefix !
+				"1234567890123456789012345e", // Without 'i' Prefix !
 			),
 		),
 		isErrorExpected: true,
-		expectedResult:  int64(12345),
 	})
 
 	// Test #5. Negative: Unexpected End.
@@ -454,7 +448,6 @@ func Test_readInteger(t *testing.T) {
 			),
 		),
 		isErrorExpected: true,
-		expectedResult:  int64(12345),
 	})
 
 	// Test #6. Negative: No Data.
@@ -465,14 +458,24 @@ func Test_readInteger(t *testing.T) {
 			),
 		),
 		isErrorExpected: true,
-		expectedResult:  int64(12345),
+	})
+
+	// Test #7. Positive: Maximum Size.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"-2345678901234567890e", // Without 'i' Prefix !
+			),
+		),
+		isErrorExpected: false,
+		expectedResult:  int64(-2345678901234567890),
 	})
 
 	// Run the Tests.
 	for i, test := range tests {
 		fmt.Printf("Test #%v.\r\n", i+1)
 		decoder := NewDecoder(test.reader)
-		result, err := decoder.readInteger(integerMaxLen)
+		result, err := decoder.readInteger()
 		if test.isErrorExpected {
 			aTest.MustBeAnError(err)
 			fmt.Println(err)

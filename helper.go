@@ -35,7 +35,7 @@ import (
 func convertByteStringToInteger(
 	ba []byte,
 ) (result int64, err error) {
-	if len(ba) > ByteStringMaxLength {
+	if len(ba) > IntegerMaxLength {
 		err = ErrByteStringToInt
 		return
 	}
@@ -47,7 +47,7 @@ func convertByteStringToInteger(
 func convertByteStringToNonNegativeInteger(
 	ba []byte,
 ) (result uint64, err error) {
-	if len(ba) > ByteStringMaxLength {
+	if len(ba) > IntegerMaxLength {
 		err = ErrByteStringToInt
 		return
 	}
@@ -76,15 +76,6 @@ func convertInterfaceToString(
 			return
 		}
 	}
-	return
-}
-
-// Calculates how many numeric Symbols are required to write the Size Prefix.
-func getByteStringSizeHeaderMaxLen(
-	byteStringLen uint,
-) (byteStringSizeHeaderMaxLen int) {
-	s := strconv.FormatUint(uint64(byteStringLen), 10)
-	byteStringSizeHeaderMaxLen = len([]rune(s))
 	return
 }
 
