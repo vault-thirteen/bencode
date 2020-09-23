@@ -65,7 +65,7 @@ func Test_combineErrors(t *testing.T) {
 	// Test #4.
 	tests = append(tests, TestData{
 		e1:                    errors.New("Aaa"),
-		e2:                    errors.New("bbb"),
+		e2:                    errors.New("Bbb"),
 		expectedCombinedError: errors.New("Aaa: Bbb"),
 	})
 
