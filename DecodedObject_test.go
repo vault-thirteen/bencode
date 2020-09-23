@@ -26,6 +26,7 @@ package bencode
 import (
 	"encoding/hex"
 	"testing"
+	"time"
 
 	"github.com/vault-thirteen/tester"
 )
@@ -57,6 +58,20 @@ func Test_CalculateBtih(t *testing.T) {
 	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(object.BTIH.Text, expectedBtihText)
 	aTest.MustBeEqual(object.BTIH.Bytes, expectedBtihBytes)
+
+	// Test #2.
+	object = DecodedObject{
+		DecodedObject: []DictionaryItem{
+			{
+				Key:   []byte("no-info"),
+				Value: "",
+			},
+		},
+	}
+	//
+	err = object.CalculateBtih()
+	//
+	aTest.MustBeAnError(err)
 }
 
 func Test_CalculateSha1(t *testing.T) {
@@ -142,6 +157,15 @@ func Test_GetInfoSection(t *testing.T) {
 	//
 	aTest.MustBeAnError(err)
 	aTest.MustBeEqual(output, nil)
+
+	// Test #3.
+	input = DecodedObject{
+		DecodedObject: time.Time{},
+	}
+	//
+	output, err = input.GetInfoSection()
+	//
+	aTest.MustBeAnError(err)
 }
 
 func Test_MakeSelfCheck(t *testing.T) {
@@ -170,4 +194,34 @@ func Test_MakeSelfCheck(t *testing.T) {
 	//
 	aTest.MustBeEqual(ok, true)
 	aTest.MustBeEqual(object.IsSelfChecked, true)
+
+	// Test #1.
+	object = DecodedObject{
+		DecodedObject: time.Time{},
+	}
+	//
+	ok = object.MakeSelfCheck()
+	//
+	aTest.MustBeEqual(ok, false)
+
+	// Test #3.
+	object = DecodedObject{
+		DecodedObject: []DictionaryItem{
+			{
+				Key:   []byte("test"),
+				Value: "Just a Test.",
+			},
+			{
+				Key:   []byte("aux"),
+				Value: "Star",
+			},
+		},
+		SourceData: []byte(
+			"...Corrupted Data...",
+		),
+	}
+	//
+	ok = object.MakeSelfCheck()
+	//
+	aTest.MustBeEqual(ok, false)
 }

@@ -21,8 +21,6 @@
 //
 //============================================================================//
 
-// The 'Decoder' Class.
-
 package bencode
 
 import (
@@ -174,6 +172,17 @@ func Test_readByteString(t *testing.T) {
 		expectedResult:  []byte("Sun"),
 	})
 
+	// Test #3. Negative: Not enough Data.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"4:X",
+			),
+		),
+		isErrorExpected: true,
+		expectedResult:  nil,
+	})
+
 	// Run the Tests.
 	for i, test := range tests {
 		fmt.Printf("Test #%v.\r\n", i+1)
@@ -245,6 +254,26 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 		expectedResult:  uint(16),
 	})
 
+	// Test #5. Negative: Empty Header.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				":Qwe",
+			),
+		),
+		isErrorExpected: true,
+	})
+
+	// Test #6. Negative: Not enough Data.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"2",
+			),
+		),
+		isErrorExpected: true,
+	})
+
 	// Run the Tests.
 	for i, test := range tests {
 		fmt.Printf("Test #%v.\r\n", i+1)
@@ -305,6 +334,36 @@ func Test_readDictionary(t *testing.T) {
 				ValueStr: "cat",
 			},
 		},
+	})
+
+	// Test #3. Negative: Bad Value.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"4:info3:ab", // Without 'd' Prefix !
+			),
+		),
+		isErrorExpected: true,
+	})
+
+	// Test #4. Negative: Bad Key.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"4:ix", // Without 'd' Prefix !
+			),
+		),
+		isErrorExpected: true,
+	})
+
+	// Test #5. Negative: No Ending.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"4:info3:abc", // Without 'd' Prefix !
+			),
+		),
+		isErrorExpected: true,
 	})
 
 	// Run the Tests.
@@ -387,6 +446,28 @@ func Test_readInteger(t *testing.T) {
 		expectedResult:  int64(12345),
 	})
 
+	// Test #5. Negative: Unexpected End.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"123", // Without 'i' Prefix !
+			),
+		),
+		isErrorExpected: true,
+		expectedResult:  int64(12345),
+	})
+
+	// Test #6. Negative: No Data.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"e", // Without 'i' Prefix !
+			),
+		),
+		isErrorExpected: true,
+		expectedResult:  int64(12345),
+	})
+
 	// Run the Tests.
 	for i, test := range tests {
 		fmt.Printf("Test #%v.\r\n", i+1)
@@ -461,6 +542,17 @@ func Test_readList(t *testing.T) {
 			[]byte("Cat"),
 			[]byte("Us"),
 		},
+	})
+
+	// Test #5. Negative: Unexpected End.
+	tests = append(tests, TestData{
+		reader: bufio.NewReader(
+			strings.NewReader(
+				"2:We",
+			),
+		),
+		isErrorExpected: true,
+		expectedResult:  nil,
 	})
 
 	// Run the Tests.
