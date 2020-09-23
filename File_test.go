@@ -33,8 +33,6 @@ import (
 	"github.com/vault-thirteen/tester"
 )
 
-//TODO
-
 // Test Settings.
 const (
 	TestFolder        = "test"
