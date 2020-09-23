@@ -49,6 +49,12 @@ func NewFile(
 	return
 }
 
+// Closes a File.
+func (f *File) close() (err error) {
+	err = f.osFile.Close()
+	return
+}
+
 // Reads the Contents of an opened File.
 func (f File) getContents() (fileContents []byte, err error) {
 
@@ -71,19 +77,25 @@ func (f File) getContents() (fileContents []byte, err error) {
 	return
 }
 
+// Opens a File.
+func (f *File) open() (err error) {
+	f.osFile, err = os.Open(f.path)
+	return
+}
+
 // Parses an input File into an Interface.
 // Also stores some additional Data, all packed into an Object.
 func (f File) Parse() (result *DecodedObject, err error) {
 
 	// Open the File and prepare a Stream Reader.
-	f.osFile, err = os.Open(f.path)
+	err = f.open()
 	if err != nil {
 		return
 	}
 	defer func() {
 		// Close the File.
 		var derr error
-		derr = f.osFile.Close()
+		derr = f.close()
 		if derr != nil {
 			err = combineErrors(err, derr)
 		}

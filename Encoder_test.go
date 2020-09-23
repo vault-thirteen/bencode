@@ -25,11 +25,10 @@ package bencode
 
 import (
 	"fmt"
+	"testing"
 	"time"
 
 	"github.com/vault-thirteen/tester"
-
-	"testing"
 )
 
 func Test_addPostfixOfDictionary(t *testing.T) {
