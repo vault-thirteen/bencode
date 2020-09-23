@@ -3,5 +3,5 @@ github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfn
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
-github.com/vault-thirteen/tester v0.0.0-20190825131329-f563e8d15528 h1:jqGX6GxdrpqxuQlnFBRfYT04NJb1HEdYUbwv+Xaruh8=
-github.com/vault-thirteen/tester v0.0.0-20190825131329-f563e8d15528/go.mod h1:13V9JwvUjfzNgL/34xG+PdWmNfssOxyMk62rhuSj5uo=
+github.com/vault-thirteen/tester v1.0.0 h1:tXg7euxchhL1fFuO4jDSAWv6Gj6Ap5CPKDCC4UMb7Yc=
+github.com/vault-thirteen/tester v1.0.0/go.mod h1:kAnv2ZqYE8t5prs3zUThX/Zwh+eSArPigSHOW9DG58k=
