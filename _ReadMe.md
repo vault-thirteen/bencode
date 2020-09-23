@@ -22,5 +22,5 @@ go get -u "github.com/neverwinter-nights/bencode"
 # Usage.
 
 ```
-import ...
+import "github.com/neverwinter-nights/bencode"
 ```
