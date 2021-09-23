@@ -13,7 +13,7 @@ packages also provides some additional functionality, such as:
   - Automatic calculation of the **BitTorrent Info Hash** (also known as
   **BTIH**) after the file decoding.
 
-This package is focused on the safety and reliability rather than Speed.<br />
+This package is focused on the safety and reliability rather than speed.<br />
 As opposed to many other existing `bencode` libraries, in this library, when 
 decoding a stream, the decoder stops at syntax errors just as they appear. 
 Moreover, the decoder is wise enough to stop when size fields are surprisingly 
