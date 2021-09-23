@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -33,7 +33,7 @@ import (
 
 func Test_addPostfixOfDictionary(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	var tmpResult = []byte("abc")
@@ -44,7 +44,7 @@ func Test_addPostfixOfDictionary(t *testing.T) {
 
 func Test_addPostfixOfList(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	var tmpResult = []byte("lt")
@@ -55,7 +55,7 @@ func Test_addPostfixOfList(t *testing.T) {
 
 func Test_addPrefixAndPostfixOfByteString(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	var tmpResult = []byte("bst")
@@ -66,7 +66,7 @@ func Test_addPrefixAndPostfixOfByteString(t *testing.T) {
 
 func Test_addPrefixAndPostfixOfInteger(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	var tmpResult = []byte("909")
@@ -77,7 +77,7 @@ func Test_addPrefixAndPostfixOfInteger(t *testing.T) {
 
 func Test_addPrefixOfDictionary(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	var tmpResult = []byte("xx")
@@ -88,7 +88,7 @@ func Test_addPrefixOfDictionary(t *testing.T) {
 
 func Test_addPrefixOfList(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	var tmpResult = []byte("nn")
@@ -99,7 +99,7 @@ func Test_addPrefixOfList(t *testing.T) {
 
 func Test_createSizePrefix(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	result := encoder.createSizePrefix(3)
@@ -109,7 +109,7 @@ func Test_createSizePrefix(t *testing.T) {
 
 func Test_createTextFromInteger(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	result := encoder.createTextFromInteger(-56)
@@ -119,7 +119,7 @@ func Test_createTextFromInteger(t *testing.T) {
 
 func Test_createTextFromUInteger(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	encoder := NewEncoder()
 	result := encoder.createTextFromUInteger(56)
@@ -135,7 +135,7 @@ func Test_EncodeAnInterface(t *testing.T) {
 		expectedResult  interface{}
 	}
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var tests []TestData
 
 	// Test #1. Slice.
@@ -158,7 +158,7 @@ func Test_EncodeAnInterface(t *testing.T) {
 
 	// Test #4. Int.
 	tests = append(tests, TestData{
-		dataToBeEncoded: int(-124),
+		dataToBeEncoded: -124,
 		expectedResult:  []byte("i-124e"),
 	})
 
@@ -235,14 +235,14 @@ func Test_EncodeAnInterface(t *testing.T) {
 
 func Test_encodeDictionary(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1.
 	encoder := NewEncoder()
-	var dictionary []DictionaryItem = []DictionaryItem{
+	var dictionary = []DictionaryItem{
 		{
 			Key:      []byte("Aa"),
-			Value:    int(123),
+			Value:    123,
 			KeyStr:   "Aa",
 			ValueStr: "123",
 		},
@@ -273,11 +273,11 @@ func Test_encodeDictionary(t *testing.T) {
 
 func Test_encodeInterfaceOfInt(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = int(123)
+	var data interface{} = 123
 	var resultExpected = []byte("i123e")
 	result, err := encoder.encodeInterfaceOfInt(data)
 	aTest.MustBeNoError(err)
@@ -291,7 +291,7 @@ func Test_encodeInterfaceOfInt(t *testing.T) {
 
 func Test_encodeInterfaceOfInt8(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -309,7 +309,7 @@ func Test_encodeInterfaceOfInt8(t *testing.T) {
 
 func Test_encodeInterfaceOfInt16(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -327,7 +327,7 @@ func Test_encodeInterfaceOfInt16(t *testing.T) {
 
 func Test_encodeInterfaceOfInt32(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -345,7 +345,7 @@ func Test_encodeInterfaceOfInt32(t *testing.T) {
 
 func Test_encodeInterfaceOfInt64(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -363,11 +363,11 @@ func Test_encodeInterfaceOfInt64(t *testing.T) {
 
 func Test_encodeInterfaceOfList(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data []interface{} = []interface{}{
+	var data = []interface{}{
 		int8(123),
 		"Qwe",
 	}
@@ -387,7 +387,7 @@ func Test_encodeInterfaceOfList(t *testing.T) {
 
 func Test_encodeInterfaceOfSlice(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Slice of Bytes.
 	encoder := NewEncoder()
@@ -401,7 +401,7 @@ func Test_encodeInterfaceOfSlice(t *testing.T) {
 	data = []DictionaryItem{
 		{
 			Key:      []byte("Aa"),
-			Value:    int(123),
+			Value:    123,
 			KeyStr:   "Aa",
 			ValueStr: "123",
 		},
@@ -429,7 +429,7 @@ func Test_encodeInterfaceOfSlice(t *testing.T) {
 
 func Test_encodeInterfaceOfSliceOfBytes(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -447,7 +447,7 @@ func Test_encodeInterfaceOfSliceOfBytes(t *testing.T) {
 
 func Test_encodeInterfaceOfString(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -465,7 +465,7 @@ func Test_encodeInterfaceOfString(t *testing.T) {
 
 func Test_encodeInterfaceOfUint(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -483,7 +483,7 @@ func Test_encodeInterfaceOfUint(t *testing.T) {
 
 func Test_encodeInterfaceOfUint8(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -501,7 +501,7 @@ func Test_encodeInterfaceOfUint8(t *testing.T) {
 
 func Test_encodeInterfaceOfUint16(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -519,7 +519,7 @@ func Test_encodeInterfaceOfUint16(t *testing.T) {
 
 func Test_encodeInterfaceOfUint32(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
@@ -537,7 +537,7 @@ func Test_encodeInterfaceOfUint32(t *testing.T) {
 
 func Test_encodeInterfaceOfUint64(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Positive.
 	encoder := NewEncoder()

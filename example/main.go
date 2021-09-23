@@ -11,16 +11,11 @@ import (
 )
 
 func main() {
-	var err error = checkFileHashSum()
-	if err == nil {
-		fmt.Println("OK")
-	} else {
-		fmt.Println("Error.", err)
-	}
+	var err = checkFileHashSum()
+	checkError(err)
 }
 
 func checkFileHashSum() (err error) {
-
 	// Settings.
 	const (
 		ExampleFolder = "example"
@@ -29,36 +24,51 @@ func checkFileHashSum() (err error) {
 		FileName      = "5942384.torrent"
 	)
 
-	// Parse the File.
-	var f *bencode.File = bencode.NewFile(
+	// Parse the file.
+	var f = bencode.NewFile(
 		filepath.Join(ExampleFolder, DataFolder, FileName),
 	)
+
 	var decodedObject *bencode.DecodedObject
 	decodedObject, err = f.Parse()
 	if err != nil {
-		return
+		return err
 	}
 
 	// Check the BTIH.
-	var ok bool = (decodedObject.BTIH.Text == Btih)
+	var ok = (decodedObject.BTIH.Text == Btih)
+
 	var btihBytesExpected []byte
 	btihBytesExpected, err = hex.DecodeString(Btih)
 	if err != nil {
-		return
+		return err
 	}
+
 	ok = ok && (bytes.Equal(
 		decodedObject.BTIH.Bytes[:],
 		btihBytesExpected,
 	))
+
 	if !ok {
-		var msg = fmt.Sprintf(
+		err = errors.New(fmt.Sprintf(
 			"BTIH Mismatch. Expected:%v. Got:%v.",
 			Btih,
 			decodedObject.BTIH.Text,
-		)
-		err = errors.New(msg)
+		))
+
+		return err
+	}
+
+	return nil
+}
+
+// checkError checks an error and prints the result to the std::out.
+func checkError(err error) {
+	if err != nil {
+		fmt.Println("Error.", err)
+
 		return
 	}
 
-	return
+	fmt.Println("OK")
 }

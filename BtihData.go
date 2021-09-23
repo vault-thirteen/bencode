@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,12 +21,10 @@
 //
 //============================================================================//
 
-// The 'BtihData' Class.
-
 package bencode
 
-// Information about BitTorrent Info Hash (BTIH) Check Sum stored as Text and
-// an Array of Bytes.
+// BtihData is the information about the BitTorrent Info Hash (BTIH) check sum
+// stored both as a text and as an array of bytes.
 type BtihData struct {
 	Bytes Sha1Sum
 	Text  string

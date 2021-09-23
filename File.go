@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,8 +21,6 @@
 //
 //============================================================================//
 
-// The 'File' Class.
-
 package bencode
 
 import (
@@ -32,114 +30,116 @@ import (
 	"time"
 )
 
-// A File.
+// File is a file.
 type File struct {
 	path   string
 	osFile *os.File
 }
 
-// File's Constructor.
+// NewFile is a file's constructor.
 func NewFile(
 	filePath string,
-) (result *File) {
-	result = new(File)
+) (f *File) {
+	f = &File{
+		path: filePath,
+	}
 
-	result.path = filePath
-
-	return
+	return f
 }
 
-// Closes a File.
+// close closes a file.
 func (f *File) close() (err error) {
-	err = f.osFile.Close()
-	return
+	return f.osFile.Close()
 }
 
-// Reads the Contents of an opened File.
+// getContents reads the contents of an opened file.
 func (f File) getContents() (fileContents []byte, err error) {
 
-	// Fool Check.
+	// Fool check.
 	if f.osFile == nil {
-		err = ErrFileNotInitialized
-		return
+		return nil, ErrFileNotInitialized
 	}
 
 	_, err = f.osFile.Seek(0, 0)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	fileContents, err = ioutil.ReadFile(f.path)
+	fileContents, err = ioutil.ReadAll(f.osFile)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	return
+	return fileContents, nil
 }
 
-// Opens a File.
+// open opens a file.
 func (f *File) open() (err error) {
 	f.osFile, err = os.Open(f.path)
-	return
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// Parses an input File into an Interface.
-// Also stores some additional Data, all packed into an Object.
+// Parse parses an input file into an interface. It also stores some
+// additional data, all packed into an object.
 func (f File) Parse() (result *DecodedObject, err error) {
 
-	// Open the File and prepare a Stream Reader.
+	// Open the file and prepare a stream reader.
 	err = f.open()
 	if err != nil {
-		return
+		return nil, err
 	}
+
 	defer func() {
-		// Close the File.
+		// Close the file.
 		var derr error
 		derr = f.close()
 		if derr != nil {
 			err = combineErrors(err, derr)
 		}
 	}()
-	var bufioReader *bufio.Reader = bufio.NewReader(f.osFile)
 
-	// Parse the File encoded with 'bencode' Encoding into an Object.
-	var decoder *Decoder = NewDecoder(bufioReader)
+	var bufioReader = bufio.NewReader(f.osFile)
+
+	// Parse the file encoded with 'bencode' encoding into an object.
+	var decoder = NewDecoder(bufioReader)
 	var ifc interface{}
 	ifc, err = decoder.readBencodedValue()
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	// Get the File Contents.
+	// Get the file contents.
 	var fileContents []byte
 	fileContents, err = f.getContents()
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	// Prepare Result.
-	var object *DecodedObject
-	object = &DecodedObject{
+	// Prepare the result.
+	var decodedObject *DecodedObject
+	decodedObject = &DecodedObject{
 		FilePath:        f.path,
 		SourceData:      fileContents,
 		DecodedObject:   ifc,
 		DecodeTimestamp: time.Now().Unix(),
 	}
 
-	// Perform a Self-Check.
+	// Perform a self-check.
 	var ok bool
-	ok = object.MakeSelfCheck()
+	ok = decodedObject.MakeSelfCheck()
 	if !ok {
-		err = ErrSelfCheck
-		return
+		return nil, ErrSelfCheck
 	}
 
-	// Calculate BTIH.
-	err = object.CalculateBtih()
+	// Calculate the BTIH.
+	err = decodedObject.CalculateBtih()
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	result = object
-	return
+	return decodedObject, nil
 }

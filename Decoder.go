@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,8 +21,6 @@
 //
 //============================================================================//
 
-// The 'Decoder' Class.
-
 package bencode
 
 import (
@@ -31,47 +29,47 @@ import (
 	"fmt"
 )
 
-//	1.	Parser's Settings.
+//	1.	Parser's settings.
 
-//	1.1.	Integer Size (Number of ASCII Letters allowed).
-// N.B.: Maximum Value of UInt64 is '18446744073709551615'.
+//	1.1.	Integer size (number of ASCII letters allowed).
+// N.B.: Maximum value of UInt64 is '18446744073709551615'.
 const IntegerMaxLength = 20
 
-//	1.2.	Byte String Size Header Length (Number of ASCII Letters allowed).
+//	1.2.	Byte string size header length (number of ASCII letters allowed).
 const ByteStringSizeHeaderMaxLength = IntegerMaxLength
 
-// A 'bencode' Decoder.
+// Decoder is a 'bencode' decoder.
 type Decoder struct {
 	reader *bufio.Reader
 }
 
-// Decoder's Constructor.
+// NewDecoder is the decoder's constructor.
 func NewDecoder(
 	reader *bufio.Reader,
-) (result *Decoder) {
-	result = new(Decoder)
+) (d *Decoder) {
+	d = &Decoder{
+		reader: reader,
+	}
 
-	result.reader = reader
-
-	return
+	return d
 }
 
-// Decodes a 'bencoded' Byte Stream into an Interface.
+// Decode decodes a 'bencoded' byte stream into an interface.
 func (d Decoder) Decode() (result interface{}, err error) {
 	return d.readBencodedValue()
 }
 
-// Reads a raw "bencoded" Value, including its Sub-values.
+// readBencodedValue reads a raw "bencoded" value, including its sub-values.
 func (d Decoder) readBencodedValue() (result interface{}, err error) {
 
-	// Get the first Byte from Stream to know its Type.
+	// Get the first byte from stream to know its type.
 	var b byte
 	b, err = d.reader.ReadByte()
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	// Analyze the Type.
+	// Analyze the type.
 	if b == HeaderDictionary {
 		return d.readDictionary()
 
@@ -82,159 +80,159 @@ func (d Decoder) readBencodedValue() (result interface{}, err error) {
 		return d.readInteger()
 
 	} else if isByteNonNegativeAsciiNumeric(b) {
-		// It must be an ASCII Number indicating a Byte String.
-		// => Byte String.
+		// It must be an ASCII number indicating a byte string.
+		// => Byte string.
 
-		// Rewind the Cursor back, as it does not have a Type-Prefix!
-		// The 'bencode' Encoding is ugly...
+		// Rewind the Cursor back, as it does not have a type-Prefix !
+		// The 'bencode' encoding is ugly ...
 		err = d.reader.UnreadByte()
 		if err != nil {
 			return nil, err
 		}
 
-		// Read the Byte String.
+		// Read the byte string.
 		return d.readByteString()
 	}
 
-	// Otherwise, it is a Syntax Error.
-	var errorArea []byte = []byte{b}
-	err = fmt.Errorf(ErrFmtSyntaxErrorAt, errorArea)
-	return nil, err
+	// Otherwise, it is a syntax error.
+	var errorArea = []byte{b}
+
+	return nil, fmt.Errorf(ErrFSyntaxErrorAt, errorArea)
 }
 
-// Reads a Byte String from the Stream (Reader).
+// readByteString reads a byte string from the stream (reader).
 func (d Decoder) readByteString() (ba []byte, err error) {
 
-	// Read the Size Header and verify it.
+	// Read the size header and verify it.
 	var byteStringLen uint
 	byteStringLen, err = d.readByteStringSizeHeader()
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	// Now we should read the Byte String.
+	// Now we should read the byte string.
 	var b byte
 	var i uint = 0
 	var bytesAccumulator *bytes.Buffer
 	bytesAccumulator = bytes.NewBuffer([]byte{})
 	for i < byteStringLen {
 
-		// Read next Symbol.
+		// Read the next symbol.
 		b, err = d.reader.ReadByte()
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		// Save the Byte to the Accumulator.
+		// Save the byte to the accumulator.
 		err = bytesAccumulator.WriteByte(b)
 		if err != nil {
-			return
+			return nil, err
 		}
 
 		i++
 	}
 
 	ba = bytesAccumulator.Bytes()
-	return
+
+	return ba, nil
 }
 
-// Reads the Size Header of a Byte String from the Stream (Reader) and
-// converts its Value into an Integer.
+// readByteStringSizeHeader reads the size header of a byte string from the
+// stream (reader) and converts its value into an integer.
 func (d Decoder) readByteStringSizeHeader() (byteStringLen uint, err error) {
 
-	// Read the first Byte.
+	// Read the first byte.
 	var b byte
 	b, err = d.reader.ReadByte()
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	var sizeHeader []byte
 	for b != HeaderStringSizeValueDelimiter {
 
-		// Syntax Check.
+		// Syntax check.
 		if !isByteNonNegativeAsciiNumeric(b) {
-			var errorArea []byte = append(sizeHeader, []byte{b}...)
-			err = fmt.Errorf(ErrFmtSyntaxErrorAt, errorArea)
-			return
+			var errorArea = append(sizeHeader, []byte{b}...)
+
+			return 0, fmt.Errorf(ErrFSyntaxErrorAt, errorArea)
 		}
 
-		// Save Byte to Size Header.
+		// Save the byte into the size header.
 		if len(sizeHeader) < ByteStringSizeHeaderMaxLength {
 			sizeHeader = append(sizeHeader, b)
 		} else {
-			// The Length Header is too big!
-			var errorArea []byte = append(sizeHeader, []byte{b}...)
-			err = fmt.Errorf(
+			// The length header is too big !
+			var errorArea = append(sizeHeader, []byte{b}...)
+
+			return 0, fmt.Errorf(
 				ErrHeaderLengthError,
 				errorArea,
 			)
-			return
 		}
 
-		// Read next Byte.
+		// Read the next byte.
 		b, err = d.reader.ReadByte()
 		if err != nil {
-			return
+			return 0, err
 		}
 	}
 
-	// Check the Header's Length.
+	// Check the header's length.
 	if len(sizeHeader) == 0 {
-		var errorArea []byte = append(sizeHeader, []byte{b}...)
-		err = fmt.Errorf(ErrFmtSyntaxErrorAt, errorArea)
-		return
+		var errorArea = append(sizeHeader, []byte{b}...)
+
+		return 0, fmt.Errorf(ErrFSyntaxErrorAt, errorArea)
 	}
 
-	// Convert the Size Header into normal integer Size Value.
+	// Convert the size header into a normal integer size value.
 	var byteStringLenUint64 uint64
 	byteStringLenUint64, err = convertByteStringToNonNegativeInteger(sizeHeader)
 	if err != nil {
-		return
+		return 0, err
 	}
-	byteStringLen = uint(byteStringLenUint64)
-	return
+
+	return uint(byteStringLenUint64), nil
 }
 
-// Reads a Dictionary.
-// We suppose that the Header of Dictionary ('d')
-// has already been read from the Stream.
+// readDictionary reads a dictionary. We suppose that the header of the
+// dictionary ('d') has already been read from the stream.
 func (d Decoder) readDictionary() (result interface{}, err error) {
 
-	// Prepare Data.
-	var dictionary []DictionaryItem
-	dictionary = make([]DictionaryItem, 0)
+	// Prepare the data.
+	var dictionary = make([]DictionaryItem, 0)
 
-	// Probe the Next Byte to check the End of Dictionary.
+	// Probe the next byte to check the end of the dictionary.
 	var b byte
 	b, err = d.reader.ReadByte()
 	if err != nil {
-		return
+		return nil, err
 	}
+
 	for b != FooterCommon {
 
-		// That single Byte (we probed) was not an End!
-		// We must get back, rewind that Byte.
+		// That single byte (we probed) was not an End !
+		// We must get back, rewind that byte.
 		err = d.reader.UnreadByte()
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		// Get the Key.
+		// Get the key.
 		var dictKey []byte
 		dictKey, err = d.readDictionaryKey()
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		// Get the Value.
+		// Get the value.
 		var dictValue interface{}
 		dictValue, err = d.readDictionaryValue()
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		// Save Item into Dictionary.
+		// Save the item into the dictionary.
 		dictionary = append(
 			dictionary,
 			DictionaryItem{
@@ -242,128 +240,123 @@ func (d Decoder) readDictionary() (result interface{}, err error) {
 				Key:   dictKey,
 				Value: dictValue,
 
-				// Additional Fields for special Purposes.
+				// Additional Fields for special purposes.
 				KeyStr:   string(dictKey),
 				ValueStr: convertInterfaceToString(dictValue),
 			},
 		)
 
-		// Probe the Next Byte to check the End of Dictionary.
+		// Probe the next byte to check the end of the dictionary.
 		b, err = d.reader.ReadByte()
 		if err != nil {
-			return
+			return nil, err
 		}
 	}
 
-	result = dictionary
-	return
+	return dictionary, nil
 }
 
-// Reads a Dictionary's Key.
+// readDictionaryKey reads a dictionary's key.
 func (d Decoder) readDictionaryKey() ([]byte, error) {
 	return d.readByteString()
 }
 
-// Reads a Dictionary's Value.
+// readDictionaryValue reads a dictionary's value.
 func (d Decoder) readDictionaryValue() (interface{}, error) {
 	return d.readBencodedValue()
 }
 
-// Reads an Integer from the Stream (Reader).
-// We suppose that the Header of Integer ('i')
-// has already been read from the Stream.
+// readInteger reads an integer from the stream (reader). We suppose that the
+// header of the integer ('i') has already been read from the stream.
 func (d Decoder) readInteger() (value int64, err error) {
 
-	// Prepare Data.
-	var valueBA []byte = []byte{}
+	// Prepare the data.
+	var valueBA []byte
 
-	// Read the first Byte.
+	// Read the first byte.
 	var b byte
 	b, err = d.reader.ReadByte()
 	if err != nil {
-		return
+		return 0, err
 	}
 
 	for b != FooterCommon {
 
-		// Syntax Check.
+		// Syntax check.
 		if !isByteAsciiNumeric(b) {
-			var errorArea []byte = append(valueBA, []byte{b}...)
-			err = fmt.Errorf(ErrFmtSyntaxErrorAt, errorArea)
-			return
+			var errorArea = append(valueBA, []byte{b}...)
+
+			return 0, fmt.Errorf(ErrFSyntaxErrorAt, errorArea)
 		}
 
-		// Save Byte to Value Byte Array.
+		// Save the byte into the value byte array.
 		if len(valueBA) < IntegerMaxLength {
 			valueBA = append(valueBA, b)
 		} else {
-			// The Integer is too big!
-			var errorArea []byte = append(valueBA, []byte{b}...)
-			err = fmt.Errorf(
-				ErrfIntegerLengthError,
-				errorArea,
-			)
-			return
+			// The integer is too big !
+			var errorArea = append(valueBA, []byte{b}...)
+
+			return 0, fmt.Errorf(ErrFIntegerLengthError, errorArea)
 		}
 
-		// Read next Byte.
+		// Read the next byte.
 		b, err = d.reader.ReadByte()
 		if err != nil {
-			return
+			return 0, err
 		}
 	}
 
-	// We have read the Value.
+	// We have read the value.
 	// Check that it is not empty.
 	if len(valueBA) == 0 {
-		var errorArea []byte = append(valueBA, []byte{b}...)
-		err = fmt.Errorf(ErrFmtSyntaxErrorAt, errorArea)
-		return
+		var errorArea = append(valueBA, []byte{b}...)
+
+		return 0, fmt.Errorf(ErrFSyntaxErrorAt, errorArea)
 	}
 
-	// Convert Value into normal integer Value.
+	// Convert the value into a normal integer value.
 	return convertByteStringToInteger(valueBA)
 }
 
-// Reads a List from the Stream (Reader).
-// We suppose that the Header of List ('l')
-// has already been read from the Stream.
+// readList reads a list from the stream (reader). We suppose that the header
+// of the list ('l') has already been read from the stream.
 func (d Decoder) readList() (list []interface{}, err error) {
 
-	// Prepare Data.
+	// Prepare the data.
 	list = make([]interface{}, 0)
 
-	// Probe the Next Byte to check the End of List.
+	// Probe the next byte to check the end of the list.
 	var b byte
 	b, err = d.reader.ReadByte()
 	if err != nil {
-		return
+		return nil, err
 	}
+
 	for b != FooterCommon {
 
-		// That single Byte (we probed) was not an End!
-		// We must get back, rewind that Byte.
+		// That single byte (we probed) was not an End !
+		// We must get back, rewind that byte.
 		err = d.reader.UnreadByte()
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		// Get the Item.
+		// Get the item.
 		var listItem interface{}
 		listItem, err = d.readBencodedValue()
 		if err != nil {
-			return
+			return nil, err
 		}
 
-		// Save Item into Dictionary.
+		// Save the item into the dictionary.
 		list = append(list, listItem)
 
-		// Probe the Next Byte to check the End of List.
+		// Probe the next byte to check the end of the list.
 		b, err = d.reader.ReadByte()
 		if err != nil {
-			return
+			return nil, err
 		}
 	}
 
-	return
+	return list, nil
 }

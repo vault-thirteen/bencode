@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,17 +21,15 @@
 //
 //============================================================================//
 
-// The 'DictionaryItem' Class.
-
 package bencode
 
-// A 'bencode' Dictionary Item.
+// DictionaryItem is a 'bencode' dictionary item.
 type DictionaryItem struct {
 	// System Fields.
 	Key   []byte
 	Value interface{}
 
-	// Additional Fields for special Purposes.
+	// Additional Fields for special purposes.
 	KeyStr   string
 	ValueStr string
 }

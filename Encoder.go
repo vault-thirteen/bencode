@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,8 +21,6 @@
 //
 //============================================================================//
 
-// The 'Encoder' Class.
-
 package bencode
 
 import (
@@ -30,83 +28,81 @@ import (
 	"strconv"
 )
 
-// A 'bencode' Encoder.
+// Encoder is a 'bencode' encoder.
 type Encoder struct {
 
-	// Cached Prefixes.
+	// Cached prefixes.
 	commonPostfix    []byte
 	dictionaryPrefix []byte
 	integerPrefix    []byte
 	listPrefix       []byte
 }
 
-// Encoder's Constructor.
-func NewEncoder() (result *Encoder) {
-	result = new(Encoder)
+// NewEncoder is an encoder's constructor.
+func NewEncoder() (e *Encoder) {
+	e = &Encoder{
+		commonPostfix:    []byte{FooterCommon},
+		dictionaryPrefix: []byte{HeaderDictionary},
+		integerPrefix:    []byte{HeaderInteger},
+		listPrefix:       []byte{HeaderList},
+	}
 
-	result.commonPostfix = []byte{FooterCommon}
-	result.dictionaryPrefix = []byte{HeaderDictionary}
-	result.integerPrefix = []byte{HeaderInteger}
-	result.listPrefix = []byte{HeaderList}
-
-	return
+	return e
 }
 
-// Adds a postfix to the 'bencode' Dictionary.
+// addPostfixOfDictionary adds a postfix to the 'bencode' dictionary.
 func (e Encoder) addPostfixOfDictionary(
 	tmpResult []byte,
 ) (result []byte) {
-	result = append(tmpResult, e.commonPostfix...)
-	return
+	return append(tmpResult, e.commonPostfix...)
 }
 
-// Adds a Postfix to the 'bencode' List.
+// addPostfixOfList adds a Postfix to the 'bencode' list.
 func (e Encoder) addPostfixOfList(
 	tmpResult []byte,
 ) (result []byte) {
-	result = append(tmpResult, e.commonPostfix...)
-	return
+	return append(tmpResult, e.commonPostfix...)
 }
 
-// Adds a Prefix and a Postfix to the 'bencode' Byte String.
+// addPrefixAndPostfixOfByteString adds a prefix and a postfix to the 'bencode'
+// byte string.
 func (e Encoder) addPrefixAndPostfixOfByteString(
 	tmpResult []byte,
 ) (result []byte) {
-	result = append(
+	return append(
 		e.createSizePrefix(
 			uint64(len(tmpResult)),
 		),
 		tmpResult...,
 	)
-	return
 }
 
-// Adds a Prefix and a Postfix to the 'bencode' Integer.
+// addPrefixAndPostfixOfInteger adds a prefix and a postfix to the 'bencode'
+// integer.
 func (e Encoder) addPrefixAndPostfixOfInteger(
 	tmpResult []byte,
 ) (result []byte) {
-	result = append(e.integerPrefix, tmpResult...)
-	result = append(result, e.commonPostfix...)
-	return
+	return append(
+		append(e.integerPrefix, tmpResult...),
+		e.commonPostfix...,
+	)
 }
 
-// Adds a Prefix to the 'bencode' Dictionary.
+// addPrefixOfDictionary adds a prefix to the 'bencode' dictionary.
 func (e Encoder) addPrefixOfDictionary(
 	tmpResult []byte,
 ) (result []byte) {
-	result = append(e.dictionaryPrefix, tmpResult...)
-	return
+	return append(e.dictionaryPrefix, tmpResult...)
 }
 
-// Adds a Prefix to the 'bencode' List.
+// addPrefixOfList adds a prefix to the 'bencode' list.
 func (e Encoder) addPrefixOfList(
 	tmpResult []byte,
 ) (result []byte) {
-	result = append(e.listPrefix, tmpResult...)
-	return
+	return append(e.listPrefix, tmpResult...)
 }
 
-// Creates a Size Prefix with a Delimiter.
+// createSizePrefix creates a size prefix with a delimiter.
 func (e Encoder) createSizePrefix(
 	size uint64,
 ) []byte {
@@ -118,7 +114,7 @@ func (e Encoder) createSizePrefix(
 	)
 }
 
-// Creates an ASCII Text (Byte Array) of a signed Integer.
+// createTextFromInteger creates an ASCII text (byte array) of a signed integer.
 func (e Encoder) createTextFromInteger(
 	value int64,
 ) []byte {
@@ -127,7 +123,8 @@ func (e Encoder) createTextFromInteger(
 	)
 }
 
-// Creates an ASCII Text (Byte Array) of an unsigned Integer.
+// createTextFromUInteger creates an ASCII text (byte array) of an unsigned
+// integer.
 func (e Encoder) createTextFromUInteger(
 	value uint64,
 ) []byte {
@@ -136,13 +133,13 @@ func (e Encoder) createTextFromUInteger(
 	)
 }
 
-// Encodes an Interface into an Array of Bytes.
+// EncodeAnInterface encodes an interface into an array of bytes.
 func (e Encoder) EncodeAnInterface(
 	ifc interface{},
 ) (result []byte, err error) {
 
-	// Check an Interface's Type and encode it accordingly.
-	var ifcType reflect.Kind = reflect.TypeOf(ifc).Kind()
+	// Check the interface's type and encode it accordingly.
+	var ifcType = reflect.TypeOf(ifc).Kind()
 	switch ifcType {
 
 	case reflect.Slice:
@@ -182,190 +179,186 @@ func (e Encoder) EncodeAnInterface(
 		return e.encodeInterfaceOfInt8(ifc)
 	}
 
-	// N.B.: Unfortunately, Go Language does not support generic Types,
-	// so we must write a lot of similar Code doing the same Thing.
+	// N.B.: Unfortunately, Go language does not support generic types,
+	// so we must write a lot of similar code doing the same thing.
 
-	// Unknown Type.
+	// Unknown type.
 	return nil, ErrDataType
 }
 
-// Encodes a 'bencode' Dictionary.
+// encodeDictionary encodes a 'bencode' dictionary.
 func (e Encoder) encodeDictionary(
 	dictionary []DictionaryItem,
 ) (result []byte, err error) {
 
-	// Dictionary Prefix.
+	// Dictionary prefix.
 	result = e.addPrefixOfDictionary(result)
 
-	// Add Keys and Values.
+	// Add keys and values.
 	var dictItem DictionaryItem
 	for _, dictItem = range dictionary {
 
 		var keyBA []byte
 		var valueBA []byte
 
-		// Add Key.
+		// Add the key.
 		keyBA, err = e.EncodeAnInterface(dictItem.Key)
 		if err != nil {
-			return
+			return nil, err
 		}
+
 		result = append(result, keyBA...)
 
-		// Add Value.
+		// Add the value.
 		valueBA, err = e.EncodeAnInterface(dictItem.Value)
 		if err != nil {
-			return
+			return nil, err
 		}
+
 		result = append(result, valueBA...)
 	}
 
-	// Dictionary Postfix.
-	result = e.addPostfixOfDictionary(result)
-	return
+	// Dictionary postfix.
+	return e.addPostfixOfDictionary(result), nil
 }
 
-// Encodes an int Interface as a 'bencode' Integer.
+// encodeInterfaceOfInt encodes an int interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfInt(
 	intInterface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var intVar int
 	var ok bool
 	intVar, ok = intInterface.(int)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromInteger(int64(intVar))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an int8 Interface as a 'bencode' Integer.
+// encodeInterfaceOfInt8 encodes an int8 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfInt8(
 	int8Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var int8var int8
 	var ok bool
 	int8var, ok = int8Interface.(int8)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromInteger(int64(int8var))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an int16 Interface as a 'bencode' Integer.
+// encodeInterfaceOfInt16 encodes an int16 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfInt16(
 	int16Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var int16var int16
 	var ok bool
 	int16var, ok = int16Interface.(int16)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromInteger(int64(int16var))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an int32 Interface as a 'bencode' Integer.
+// encodeInterfaceOfInt32 encodes an int32 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfInt32(
 	int32Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var int32var int32
 	var ok bool
 	int32var, ok = int32Interface.(int32)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromInteger(int64(int32var))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an int64 Interface as a 'bencode' Integer.
+// encodeInterfaceOfInt64 encodes an int64 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfInt64(
 	int64Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var int64var int64
 	var ok bool
 	int64var, ok = int64Interface.(int64)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromInteger(int64var)
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an Interface as a 'bencode' List.
+// encodeInterfaceOfList encodes an interface as a 'bencode' list.
 func (e Encoder) encodeInterfaceOfList(
 	list []interface{},
 ) (result []byte, err error) {
 
-	// List Prefix.
+	// List prefix.
 	result = e.addPrefixOfList(result)
 
-	// Add Values.
+	// Add the values.
 	var (
 		listItem interface{}
 		valueBA  []byte
 	)
 	for _, listItem = range list {
 
-		// Add Value.
+		// Add the value.
 		valueBA, err = e.EncodeAnInterface(listItem)
 		if err != nil {
-			return
+			return nil, err
 		}
+
 		result = append(result, valueBA...)
 	}
 
-	// List Postfix.
-	result = e.addPostfixOfList(result)
-	return
+	// List postfix.
+	return e.addPostfixOfList(result), nil
 }
 
-// Encodes a Slice Interface.
+// encodeInterfaceOfSlice encodes a slice interface.
 func (e Encoder) encodeInterfaceOfSlice(
 	sliceInterface interface{},
 ) (result []byte, err error) {
 
-	// Get Type of Sub-Elements.
-	var ifcElementType reflect.Kind = reflect.TypeOf(sliceInterface).Elem().Kind()
+	// Get the type of sub-elements.
+	var ifcElementType = reflect.TypeOf(sliceInterface).Elem().Kind()
 
-	// Bytes Array ?
+	// Bytes array ?
 	if ifcElementType == reflect.Uint8 {
 		return e.encodeInterfaceOfSliceOfBytes(sliceInterface)
 	}
 
-	// Try to change Type to Dictionary.
+	// Try to change the type to dictionary.
 	var dictionary []DictionaryItem
 	var ok bool
 	dictionary, ok = sliceInterface.([]DictionaryItem)
@@ -373,154 +366,146 @@ func (e Encoder) encodeInterfaceOfSlice(
 		return e.encodeDictionary(dictionary)
 	}
 
-	// Try to change Type to List.
+	// Try to change the type to list.
 	var list []interface{}
 	list, ok = sliceInterface.([]interface{})
 	if ok {
 		return e.encodeInterfaceOfList(list)
 	}
 
-	// Unknown Type.
-	err = ErrDataType
-	return
+	// Unknown type.
+	return nil, ErrDataType
 }
 
-// Encodes a Bytes Slice Interface as a 'bencode' Byte String.
+// encodeInterfaceOfSliceOfBytes encodes a bytes slice interface as a 'bencode'
+// byte string.
 func (e Encoder) encodeInterfaceOfSliceOfBytes(
 	sliceOfBytesInterface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var ok bool
 	result, ok = sliceOfBytesInterface.([]byte)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
 
-	// Add Prefixes and Postfixes to the Byte String.
-	result = e.addPrefixAndPostfixOfByteString(result)
-	return
+	// Add a prefix and a postfix to the byte string.
+	return e.addPrefixAndPostfixOfByteString(result), nil
 }
 
-// Encodes a String Interface as a 'bencode' Byte String.
+// encodeInterfaceOfString encodes a string interface as a 'bencode' byte
+// string.
 func (e Encoder) encodeInterfaceOfString(
 	stringInterface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var ok bool
 	var stringVar string
 	stringVar, ok = stringInterface.(string)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
 
-	// String → Byte Array.
+	// String → Byte array.
 	result = []byte(stringVar)
 
-	// Add Prefixes and Postfixes to the Byte String.
-	result = e.addPrefixAndPostfixOfByteString(result)
-	return
+	// Add a prefix and a postfix to the byte string.
+	return e.addPrefixAndPostfixOfByteString(result), nil
 }
 
-// Encodes an uint Interface as a 'bencode' Integer.
+// encodeInterfaceOfUint encodes an uint interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfUint(
 	uintInterface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var ok bool
 	var uintVar uint
 	uintVar, ok = uintInterface.(uint)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromUInteger(uint64(uintVar))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an uint8 Interface as a 'bencode' Integer.
+// encodeInterfaceOfUint8 encodes an uint8 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfUint8(
 	uint8Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var ok bool
 	var uint8var uint8
 	uint8var, ok = uint8Interface.(uint8)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromUInteger(uint64(uint8var))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an uint16 Interface as a 'bencode' Integer.
+// encodeInterfaceOfUint16 encodes an uint16 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfUint16(
 	uint16Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var ok bool
 	var uint16var uint16
 	uint16var, ok = uint16Interface.(uint16)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromUInteger(uint64(uint16var))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an uint32 Interface as a 'bencode' Integer.
+// encodeInterfaceOfUint32 encodes an uint32 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfUint32(
 	uint32Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var ok bool
 	var uint32var uint32
 	uint32var, ok = uint32Interface.(uint32)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromUInteger(uint64(uint32var))
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }
 
-// Encodes an uint64 Interface as a 'bencode' Integer.
+// encodeInterfaceOfUint64 encodes an uint64 interface as a 'bencode' integer.
 func (e Encoder) encodeInterfaceOfUint64(
 	uint64Interface interface{},
 ) (result []byte, err error) {
 
-	// Convert the Type.
+	// Convert the type.
 	var ok bool
 	var uint64var uint64
 	uint64var, ok = uint64Interface.(uint64)
 	if !ok {
-		err = ErrTypeAssertion
-		return
+		return nil, ErrTypeAssertion
 	}
+
 	result = e.createTextFromUInteger(uint64var)
 
-	// Add Prefixes and Postfixes to the Integer.
-	result = e.addPrefixAndPostfixOfInteger(result)
-	return
+	// Add a prefix and a postfix to the integer.
+	return e.addPrefixAndPostfixOfInteger(result), nil
 }

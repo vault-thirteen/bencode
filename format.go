@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,13 +21,11 @@
 //
 //============================================================================//
 
-// Main Settings of the 'bencode' Format.
-
 package bencode
 
-//	1.	Special Symbols of 'bencode' Encoding.
+//	1. Special symbols of 'bencode' encoding.
 
-//	1.1.	Headers.
+//	1.1. Headers.
 const (
 	HeaderDictionary               byte = 'd'
 	HeaderInteger                  byte = 'i'
@@ -35,12 +33,12 @@ const (
 	HeaderStringSizeValueDelimiter byte = ':'
 )
 
-//	1.2.	Footers.
+//	1.2. Footers.
 const (
 	FooterCommon byte = 'e'
 )
 
-//	1.3.	Sections of a BitTorrent File.
+//	1.3. Sections of a BitTorrent file.
 const (
 	FileSectionAnnounce     = "announce"
 	FileSectionAnnounceList = "announce-list"

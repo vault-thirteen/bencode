@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -44,7 +44,7 @@ func Test_readBencodedValue(t *testing.T) {
 		expectedResult  interface{}
 	}
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var tests []TestData
 
 	// Test #1. Negative: No Data.
@@ -146,7 +146,7 @@ func Test_readByteString(t *testing.T) {
 		expectedResult  interface{}
 	}
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var tests []TestData
 
 	// Test #1. Negative: Bad Size Header.
@@ -205,7 +205,7 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 		expectedResult  interface{}
 	}
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var tests []TestData
 
 	// Test #1. Negative: No Data.
@@ -296,7 +296,7 @@ func Test_readDictionary(t *testing.T) {
 		expectedResult  interface{}
 	}
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var tests []TestData
 
 	// Test #1. Negative: No Data.
@@ -396,7 +396,7 @@ func Test_readInteger(t *testing.T) {
 		expectedResult  interface{}
 	}
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var tests []TestData
 
 	// Test #1. Negative: No Data.
@@ -495,7 +495,7 @@ func Test_readList(t *testing.T) {
 		expectedResult  interface{}
 	}
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var tests []TestData
 
 	// Test #1. Negative: No Data.

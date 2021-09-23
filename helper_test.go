@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -30,10 +30,10 @@ import (
 )
 
 func Test_convertByteStringToInteger(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Negative.
-	var bytes []byte = []byte("123456789012345678912345")
+	var bytes = []byte("123456789012345678912345")
 	var result int64
 	var err error
 	result, err = convertByteStringToInteger(bytes)
@@ -48,10 +48,10 @@ func Test_convertByteStringToInteger(t *testing.T) {
 }
 
 func Test_convertByteStringToNonNegativeInteger(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Negative.
-	var bytes []byte = []byte("123456789012345678912345")
+	var bytes = []byte("123456789012345678912345")
 	var result uint64
 	var err error
 	result, err = convertByteStringToNonNegativeInteger(bytes)
@@ -66,7 +66,7 @@ func Test_convertByteStringToNonNegativeInteger(t *testing.T) {
 }
 
 func Test_convertInterfaceToString(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1. Negative: Not a Slice.
 	var result string
@@ -83,7 +83,7 @@ func Test_convertInterfaceToString(t *testing.T) {
 }
 
 func Test_isByteAsciiNumeric(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	aTest.MustBeEqual(isByteAsciiNumeric('0'), true)
 	aTest.MustBeEqual(isByteAsciiNumeric('1'), true)
@@ -101,7 +101,7 @@ func Test_isByteAsciiNumeric(t *testing.T) {
 }
 
 func Test_isByteNonNegativeAsciiNumeric(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	aTest.MustBeEqual(isByteNonNegativeAsciiNumeric('0'), true)
 	aTest.MustBeEqual(isByteNonNegativeAsciiNumeric('1'), true)

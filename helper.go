@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,8 +21,6 @@
 //
 //============================================================================//
 
-// Some auxiliary Helper-Functions.
-
 package bencode
 
 import (
@@ -30,57 +28,57 @@ import (
 	"strconv"
 )
 
-// Converts a Byte String into a signed 64-Bit Integer.
-// Negative Numbers are possible.
+// convertByteStringToInteger converts a byte string into a signed 64-bit
+// integer. Negative numbers are possible.
 func convertByteStringToInteger(
 	ba []byte,
 ) (result int64, err error) {
 	if len(ba) > IntegerMaxLength {
-		err = ErrByteStringToInt
-		return
+		return 0, ErrByteStringToInt
 	}
+
 	return strconv.ParseInt(string(ba), 10, 64)
 }
 
-// Converts a Byte String into an unsigned 64-Bit Integer.
-// Negative Numbers are forbidden.
+// convertByteStringToNonNegativeInteger converts a byte string into an
+// unsigned 64-bit integer. Negative numbers are forbidden.
 func convertByteStringToNonNegativeInteger(
 	ba []byte,
 ) (result uint64, err error) {
 	if len(ba) > IntegerMaxLength {
-		err = ErrByteStringToInt
-		return
+		return 0, ErrByteStringToInt
 	}
+
 	return strconv.ParseUint(string(ba), 10, 64)
 }
 
-// Tries to get a textual Data from an Interface.
+// convertInterfaceToString tries to get a textual data from an interface.
 func convertInterfaceToString(
 	src interface{},
 ) (result string) {
 
-	// Slice?
-	var srcType reflect.Kind = reflect.TypeOf(src).Kind()
-	if srcType == reflect.Slice {
-
-		// Array Item's Type is Byte?
-		var srcElementType reflect.Kind = reflect.TypeOf(src).Elem().Kind()
-		if srcElementType == reflect.Uint8 {
-			var bytes []byte
-			var ok bool
-			bytes, ok = src.([]byte)
-			if !ok {
-				return
-			}
-			result = string(bytes)
-			return
-		}
+	// Not a slice ?
+	if reflect.TypeOf(src).Kind() != reflect.Slice {
+		return ""
 	}
-	return
+
+	// Is array item's type not a byte ?
+	if reflect.TypeOf(src).Elem().Kind() != reflect.Uint8 {
+		return ""
+	}
+
+	var bytes []byte
+	var ok bool
+	bytes, ok = src.([]byte)
+	if !ok {
+		return ""
+	}
+
+	return string(bytes)
 }
 
-// Checks whether the Byte is ASCII numeric Symbol.
-// Negative Numbers are possible.
+// isByteAsciiNumeric checks whether the byte is ASCII numeric symbol. Negative
+// numbers are possible.
 func isByteAsciiNumeric(
 	b byte,
 ) (result bool) {
@@ -102,8 +100,8 @@ func isByteAsciiNumeric(
 	return false
 }
 
-// Checks whether the Byte is ASCII non-negative numeric Symbol.
-// Negative Numbers are forbidden.
+// isByteNonNegativeAsciiNumeric checks whether the byte is ASCII non-negative
+// numeric symbol. Negative numbers are forbidden.
 func isByteNonNegativeAsciiNumeric(
 	b byte,
 ) (result bool) {

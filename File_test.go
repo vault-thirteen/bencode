@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -43,7 +43,7 @@ const (
 )
 
 func createTestFolder(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	fmt.Println("Creating a Folder:", TestFolder)
 
 	err := os.MkdirAll(TestFolder, os.ModeDir)
@@ -51,7 +51,7 @@ func createTestFolder(t *testing.T) {
 }
 
 func deleteTestFolder(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	fmt.Println("Deleting a Folder:", TestFolder)
 
 	err := os.RemoveAll(TestFolder)
@@ -59,7 +59,7 @@ func deleteTestFolder(t *testing.T) {
 }
 
 func createTestFileA(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	filePath := filepath.Join(TestFolder, TestFileAName)
 	fmt.Println("Creating a File:", filePath)
@@ -74,7 +74,7 @@ func createTestFileA(t *testing.T) {
 }
 
 func createTestFileB(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	filePath := filepath.Join(TestFolder, TestFileBName)
 	fmt.Println("Creating a File:", filePath)
@@ -89,13 +89,13 @@ func createTestFileB(t *testing.T) {
 }
 
 func Test_getContents(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test Initialization.
 	createTestFolder(t)
 	createTestFileA(t)
 	filePath := filepath.Join(TestFolder, TestFileAName)
-	var f *File = NewFile(filePath)
+	var f = NewFile(filePath)
 
 	// Test Finalization.
 	defer func() {
@@ -130,13 +130,13 @@ func Test_getContents(t *testing.T) {
 }
 
 func Test_Parse(t *testing.T) {
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test Initialization.
 	createTestFolder(t)
 	createTestFileB(t)
 	filePath := filepath.Join(TestFolder, TestFileBName)
-	var f *File = NewFile(filePath)
+	var f = NewFile(filePath)
 
 	// Test Finalization.
 	defer func() {
@@ -161,7 +161,7 @@ func Test_Parse(t *testing.T) {
 	// Results Inspection.
 	aTest.MustBeDifferent(do, nil)
 	const Sha1SumTextExpected = "beb11253d7cbb2eed50ee54e33218dc1829345a7"
-	var doExpected *DecodedObject = &DecodedObject{
+	var doExpected = &DecodedObject{
 		FilePath:   filePath,
 		SourceData: []byte(TestFileBContents),
 		DecodedObject: []DictionaryItem{

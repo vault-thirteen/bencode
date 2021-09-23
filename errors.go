@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,49 +21,47 @@
 //
 //============================================================================//
 
-// Error Messages and cached Errors.
-
 package bencode
 
 import "errors"
 
-// Error Messages and Formats.
+// Error messages and formats.
 const (
-	ErrByteStringToIntError     = "Byte String to Integer Conversion Error"
-	ErrDataTypeError            = "Unsupported Type"
-	ErrSectionDoesNotExistError = "Section does not exist"
-	ErrSelfCheckError           = "Self-Check Error"
-	ErrTypeAssertionError       = "Type Assertion Error"
-	ErrFileNotInitializedError  = "File is not initialized"
-	//
-	ErrfIntegerLengthError = "The Integer is too big: %v"
-	ErrHeaderLengthError   = "The Length Header is too big: %v"
+	ErrByteStringToIntError     = "byte string to integer conversion error"
+	ErrDataTypeError            = "unsupported type"
+	ErrFileNotInitializedError  = "file is not initialized"
+	ErrHeaderLengthError        = "the length header is too big: %v"
+	ErrSectionDoesNotExistError = "section does not exist"
+	ErrSelfCheckError           = "self-check error"
+	ErrTypeAssertionError       = "type assertion error"
+
+	ErrFIntegerLengthError = "the integer is too big: %v"
 )
 
-// Cached Errors.
+// Cached errors.
 var (
 	ErrByteStringToInt     = errors.New(ErrByteStringToIntError)
 	ErrDataType            = errors.New(ErrDataTypeError)
+	ErrFileNotInitialized  = errors.New(ErrFileNotInitializedError)
 	ErrSectionDoesNotExist = errors.New(ErrSectionDoesNotExistError)
 	ErrSelfCheck           = errors.New(ErrSelfCheckError)
 	ErrTypeAssertion       = errors.New(ErrTypeAssertionError)
-	ErrFileNotInitialized  = errors.New(ErrFileNotInitializedError)
 )
 
-// Formats of Error Messages.
+// Formats of error messages.
 const (
-	ErrFmtSyntaxErrorAt = "Syntax Error At: '%v'."
-	ErrCombinator       = ": "
+	ErrFSyntaxErrorAt = "syntax error at: '%v'"
+	ErrCombinator     = ": "
 )
 
-// Combines two Errors.
+// combineErrors combines two errors.
 func combineErrors(
 	error1 error,
 	error2 error,
 ) (result error) {
 	if error1 == nil {
 		if error2 == nil {
-			return
+			return nil
 		} else {
 			return error2
 		}
@@ -71,8 +69,7 @@ func combineErrors(
 		if error2 == nil {
 			return error1
 		} else {
-			result = errors.New(error1.Error() + ErrCombinator + error2.Error())
-			return
+			return errors.New(error1.Error() + ErrCombinator + error2.Error())
 		}
 	}
 }

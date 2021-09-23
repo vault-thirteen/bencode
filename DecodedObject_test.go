@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -33,11 +33,11 @@ import (
 
 func Test_CalculateBtih(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var err error
 
 	// Test #1.
-	var object DecodedObject = DecodedObject{
+	var object = DecodedObject{
 		DecodedObject: []DictionaryItem{
 			{
 				Key:   []byte("info"),
@@ -81,7 +81,7 @@ func Test_CalculateSha1(t *testing.T) {
 		HashSumText string = "7b708ef0a8efed41f005c67546a9467bf612a145"
 	)
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1.
 	var (
@@ -107,12 +107,12 @@ func Test_CalculateSha1(t *testing.T) {
 
 func Test_GetInfoSection(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 	var output interface{}
 	var err error
 
 	// Test #1.
-	var input DecodedObject = DecodedObject{
+	var input = DecodedObject{
 		DecodedObject: []DictionaryItem{
 			{
 				Key:   []byte("aaa"),
@@ -170,10 +170,10 @@ func Test_GetInfoSection(t *testing.T) {
 
 func Test_MakeSelfCheck(t *testing.T) {
 
-	var aTest *tester.Test = tester.New(t)
+	var aTest = tester.New(t)
 
 	// Test #1.
-	var object DecodedObject = DecodedObject{
+	var object = DecodedObject{
 		DecodedObject: []DictionaryItem{
 			{
 				Key:   []byte("test"),

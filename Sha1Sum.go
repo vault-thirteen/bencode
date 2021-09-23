@@ -2,7 +2,7 @@
 
 //============================================================================//
 //
-// Copyright © 2018..2020 by McArcher.
+// Copyright © 2018..2021 by McArcher.
 //
 // All rights reserved. No part of this publication may be reproduced,
 // distributed, or transmitted in any form or by any means, including
@@ -21,8 +21,7 @@
 //
 //============================================================================//
 
-// SHA-1 Hash Sum Type.
-
 package bencode
 
+// Sha1Sum is a SHA-1 hash sum as a bytes array.
 type Sha1Sum [20]byte
