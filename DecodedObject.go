@@ -44,7 +44,7 @@ func (do *DecodedObject) CalculateBtih() (err error) {
 }
 
 // GetInfoSection gets an 'info' section from the object.
-func (do DecodedObject) GetInfoSection() (result interface{}, err error) {
+func (do *DecodedObject) GetInfoSection() (result interface{}, err error) {
 
 	// Get the dictionary.
 	var dictionary []DictionaryItem

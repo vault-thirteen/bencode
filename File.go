@@ -2,7 +2,7 @@ package bencode
 
 import (
 	"bufio"
-	"io/ioutil"
+	"io"
 	"os"
 	"time"
 )
@@ -30,7 +30,7 @@ func (f *File) close() (err error) {
 }
 
 // getContents reads the contents of an opened file.
-func (f File) getContents() (fileContents []byte, err error) {
+func (f *File) getContents() (fileContents []byte, err error) {
 
 	// Fool check.
 	if f.osFile == nil {
@@ -42,7 +42,7 @@ func (f File) getContents() (fileContents []byte, err error) {
 		return nil, err
 	}
 
-	fileContents, err = ioutil.ReadAll(f.osFile)
+	fileContents, err = io.ReadAll(f.osFile)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (f *File) open() (err error) {
 
 // Parse parses an input file into an interface. It also stores some
 // additional data, all packed into an object.
-func (f File) Parse() (result *DecodedObject, err error) {
+func (f *File) Parse() (result *DecodedObject, err error) {
 
 	// Open the file and prepare a stream reader.
 	err = f.open()

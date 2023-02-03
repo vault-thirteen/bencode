@@ -43,10 +43,12 @@ func createTestFileA(t *testing.T) {
 	file, err := os.Create(filePath)
 	aTest.MustBeNoError(err)
 
-	_, err = file.WriteString(TestFileAContents)
-	aTest.MustBeNoError(err)
+	defer func() {
+		derr := file.Close()
+		aTest.MustBeNoError(derr)
+	}()
 
-	err = file.Close()
+	_, err = file.WriteString(TestFileAContents)
 	aTest.MustBeNoError(err)
 }
 
@@ -58,10 +60,12 @@ func createTestFileB(t *testing.T) {
 	file, err := os.Create(filePath)
 	aTest.MustBeNoError(err)
 
-	_, err = file.WriteString(TestFileBContents)
-	aTest.MustBeNoError(err)
+	defer func() {
+		derr := file.Close()
+		aTest.MustBeNoError(derr)
+	}()
 
-	err = file.Close()
+	_, err = file.WriteString(TestFileBContents)
 	aTest.MustBeNoError(err)
 }
 
@@ -83,12 +87,6 @@ func Test_getContents(t *testing.T) {
 	var err error
 	err = f.open()
 	aTest.MustBeNoError(err)
-	defer func() {
-		// Close the File.
-		var derr error
-		derr = f.close()
-		aTest.MustBeNoError(derr)
-	}()
 
 	// Test #1. Positive.
 	var fileContents []byte
@@ -97,6 +95,10 @@ func Test_getContents(t *testing.T) {
 	// Results Inspection.
 	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(fileContents, []byte(TestFileAContents))
+
+	// Close the File.
+	err = f.close()
+	aTest.MustBeNoError(err)
 
 	// Test #2. Negative.
 	fOsFileOriginalValue := f.osFile
@@ -108,6 +110,7 @@ func Test_getContents(t *testing.T) {
 
 func Test_Parse(t *testing.T) {
 	var aTest = tester.New(t)
+	var err error
 
 	// Test Initialization.
 	createTestFolder(t)
@@ -118,17 +121,6 @@ func Test_Parse(t *testing.T) {
 	// Test Finalization.
 	defer func() {
 		deleteTestFolder(t)
-	}()
-
-	// Open the File.
-	var err error
-	err = f.open()
-	aTest.MustBeNoError(err)
-	defer func() {
-		// Close the File.
-		var derr error
-		derr = f.close()
-		aTest.MustBeNoError(derr)
 	}()
 
 	// Test #1. Positive.

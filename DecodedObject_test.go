@@ -51,37 +51,6 @@ func Test_CalculateBtih(t *testing.T) {
 	aTest.MustBeAnError(err)
 }
 
-func Test_CalculateSha1(t *testing.T) {
-
-	const (
-		Data        string = "Just a Test."
-		HashSumText string = "7b708ef0a8efed41f005c67546a9467bf612a145"
-	)
-
-	var aTest = tester.New(t)
-
-	// Test #1.
-	var (
-		ba                    []byte
-		data                  []byte
-		err                   error
-		expectedResultAsBytes Sha1Sum
-		expectedResultAsText  string
-		resultAsBytes         Sha1Sum
-		resultAsText          string
-	)
-	data = []byte(Data)
-	expectedResultAsText = HashSumText
-	ba, err = hex.DecodeString(HashSumText)
-	aTest.MustBeNoError(err)
-	copy(expectedResultAsBytes[:], ba)
-	//
-	resultAsBytes, resultAsText = CalculateSha1(data)
-	//
-	aTest.MustBeEqual(resultAsText, expectedResultAsText)
-	aTest.MustBeEqual(resultAsBytes, expectedResultAsBytes)
-}
-
 func Test_GetInfoSection(t *testing.T) {
 
 	var aTest = tester.New(t)
@@ -201,4 +170,35 @@ func Test_MakeSelfCheck(t *testing.T) {
 	ok = object.MakeSelfCheck()
 	//
 	aTest.MustBeEqual(ok, false)
+}
+
+func Test_CalculateSha1(t *testing.T) {
+
+	const (
+		Data        string = "Just a Test."
+		HashSumText string = "7b708ef0a8efed41f005c67546a9467bf612a145"
+	)
+
+	var aTest = tester.New(t)
+
+	// Test #1.
+	var (
+		ba                    []byte
+		data                  []byte
+		err                   error
+		expectedResultAsBytes Sha1Sum
+		expectedResultAsText  string
+		resultAsBytes         Sha1Sum
+		resultAsText          string
+	)
+	data = []byte(Data)
+	expectedResultAsText = HashSumText
+	ba, err = hex.DecodeString(HashSumText)
+	aTest.MustBeNoError(err)
+	copy(expectedResultAsBytes[:], ba)
+	//
+	resultAsBytes, resultAsText = CalculateSha1(data)
+	//
+	aTest.MustBeEqual(resultAsText, expectedResultAsText)
+	aTest.MustBeEqual(resultAsBytes, expectedResultAsBytes)
 }
