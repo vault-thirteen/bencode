@@ -1,16 +1,16 @@
-# bencode
+# Bencode
 
-A library for encoding and decoding the __Bencode__ format.
+A library for encoding and decoding the **Bencode** format.
 
 ## Description
 
 This package provides a mechanism for data encoding to and data decoding from 
-the __Bencode__ format.
+the Bencode format.
 
-The __Bencode__ format was introduced with the appearance of the __BitTorrent__ 
+The Bencode format was introduced with the appearance of the **BitTorrent** 
 protocol.
 
-Apart from the encoding and decoding data with the __Bencode__ format, this 
+Apart from the encoding and decoding data with the Bencode format, this 
 packages also provides some additional functionality, such as: 
   - Automatic self-check after file decoding;
   - Automatic calculation of the **BitTorrent Info Hash** (also known as

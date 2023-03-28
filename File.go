@@ -2,9 +2,12 @@ package bencode
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"os"
 	"time"
+
+	"github.com/vault-thirteen/errorz"
 )
 
 // File is a file.
@@ -14,9 +17,7 @@ type File struct {
 }
 
 // NewFile is a file's constructor.
-func NewFile(
-	filePath string,
-) (f *File) {
+func NewFile(filePath string) (f *File) {
 	f = &File{
 		path: filePath,
 	}
@@ -34,7 +35,7 @@ func (f *File) getContents() (fileContents []byte, err error) {
 
 	// Fool check.
 	if f.osFile == nil {
-		return nil, ErrFileNotInitialized
+		return nil, errors.New(ErrFileNotInitialized)
 	}
 
 	_, err = f.osFile.Seek(0, 0)
@@ -72,10 +73,9 @@ func (f *File) Parse() (result *DecodedObject, err error) {
 
 	defer func() {
 		// Close the file.
-		var derr error
-		derr = f.close()
+		derr := f.close()
 		if derr != nil {
-			err = combineErrors(err, derr)
+			err = errorz.Combine(err, derr)
 		}
 	}()
 
@@ -83,7 +83,7 @@ func (f *File) Parse() (result *DecodedObject, err error) {
 
 	// Parse the file encoded with 'bencode' encoding into an object.
 	var decoder = NewDecoder(bufioReader)
-	var ifc interface{}
+	var ifc any
 	ifc, err = decoder.readBencodedValue()
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (f *File) Parse() (result *DecodedObject, err error) {
 	var ok bool
 	ok = decodedObject.MakeSelfCheck()
 	if !ok {
-		return nil, ErrSelfCheck
+		return nil, errors.New(ErrSelfCheck)
 	}
 
 	// Calculate the BTIH.

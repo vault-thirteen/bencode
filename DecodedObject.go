@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 )
 
 // DecodedObject is a decoded object with some meta-data.
@@ -12,7 +13,7 @@ type DecodedObject struct {
 	// Primary Information.
 	FilePath        string
 	SourceData      []byte
-	DecodedObject   interface{}
+	DecodedObject   any
 	DecodeTimestamp int64
 
 	// Secondary Information.
@@ -24,7 +25,7 @@ type DecodedObject struct {
 func (do *DecodedObject) CalculateBtih() (err error) {
 
 	// Get the 'info' section from the decoded object.
-	var infoSection interface{}
+	var infoSection any
 	infoSection, err = do.GetInfoSection()
 	if err != nil {
 		return err
@@ -44,14 +45,14 @@ func (do *DecodedObject) CalculateBtih() (err error) {
 }
 
 // GetInfoSection gets an 'info' section from the object.
-func (do *DecodedObject) GetInfoSection() (result interface{}, err error) {
+func (do *DecodedObject) GetInfoSection() (result any, err error) {
 
 	// Get the dictionary.
 	var dictionary []DictionaryItem
 	var ok bool
 	dictionary, ok = do.DecodedObject.([]DictionaryItem)
 	if !ok {
-		return nil, ErrTypeAssertion
+		return nil, errors.New(ErrTypeAssertion)
 	}
 
 	// Get the 'info' section from the decoded object.
@@ -62,7 +63,7 @@ func (do *DecodedObject) GetInfoSection() (result interface{}, err error) {
 		}
 	}
 
-	return nil, ErrSectionDoesNotExist
+	return nil, errors.New(ErrSectionDoesNotExist)
 }
 
 // MakeSelfCheck performs a simple self-check. It encodes the decoded data and
@@ -91,9 +92,7 @@ func (do *DecodedObject) MakeSelfCheck() (success bool) {
 
 // CalculateSha1 calculates the SHA-1 check sum and returns it as a hexadecimal
 // text and byte array.
-func CalculateSha1(
-	data []byte,
-) (resultAsBytes Sha1Sum, resultAsText string) {
+func CalculateSha1(data []byte) (resultAsBytes Sha1Sum, resultAsText string) {
 	resultAsBytes = sha1.Sum(data)
 	resultAsText = hex.EncodeToString(resultAsBytes[:])
 

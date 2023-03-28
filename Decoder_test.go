@@ -18,7 +18,7 @@ func Test_readBencodedValue(t *testing.T) {
 	type TestData struct {
 		reader          *bufio.Reader
 		isErrorExpected bool
-		expectedResult  interface{}
+		expectedResult  any
 	}
 
 	var aTest = tester.New(t)
@@ -72,7 +72,7 @@ func Test_readBencodedValue(t *testing.T) {
 			),
 		),
 		isErrorExpected: false,
-		expectedResult: []interface{}{
+		expectedResult: []any{
 			[]byte("John"),
 			[]byte("Cat"),
 		},
@@ -120,7 +120,7 @@ func Test_readByteString(t *testing.T) {
 	type TestData struct {
 		reader          *bufio.Reader
 		isErrorExpected bool
-		expectedResult  interface{}
+		expectedResult  any
 	}
 
 	var aTest = tester.New(t)
@@ -179,7 +179,7 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 	type TestData struct {
 		reader          *bufio.Reader
 		isErrorExpected bool
-		expectedResult  interface{}
+		expectedResult  any
 	}
 
 	var aTest = tester.New(t)
@@ -270,7 +270,7 @@ func Test_readDictionary(t *testing.T) {
 	type TestData struct {
 		reader          *bufio.Reader
 		isErrorExpected bool
-		expectedResult  interface{}
+		expectedResult  any
 	}
 
 	var aTest = tester.New(t)
@@ -370,7 +370,7 @@ func Test_readInteger(t *testing.T) {
 	type TestData struct {
 		reader          *bufio.Reader
 		isErrorExpected bool
-		expectedResult  interface{}
+		expectedResult  any
 	}
 
 	var aTest = tester.New(t)
@@ -469,7 +469,7 @@ func Test_readList(t *testing.T) {
 	type TestData struct {
 		reader          *bufio.Reader
 		isErrorExpected bool
-		expectedResult  interface{}
+		expectedResult  any
 	}
 
 	var aTest = tester.New(t)
@@ -505,7 +505,7 @@ func Test_readList(t *testing.T) {
 			),
 		),
 		isErrorExpected: false,
-		expectedResult: []interface{}{
+		expectedResult: []any{
 			[]byte("We"),
 		},
 	})
@@ -518,7 +518,7 @@ func Test_readList(t *testing.T) {
 			),
 		),
 		isErrorExpected: false,
-		expectedResult: []interface{}{
+		expectedResult: []any{
 			[]byte("Cat"),
 			[]byte("Us"),
 		},

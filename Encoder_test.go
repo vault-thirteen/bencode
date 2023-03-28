@@ -107,9 +107,9 @@ func Test_createTextFromUInteger(t *testing.T) {
 func Test_EncodeAnInterface(t *testing.T) {
 
 	type TestData struct {
-		dataToBeEncoded interface{}
+		dataToBeEncoded any
 		isErrorExpected bool
-		expectedResult  interface{}
+		expectedResult  any
 	}
 
 	var aTest = tester.New(t)
@@ -254,7 +254,7 @@ func Test_encodeInterfaceOfInt(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = 123
+	var data any = 123
 	var resultExpected = []byte("i123e")
 	result, err := encoder.encodeInterfaceOfInt(data)
 	aTest.MustBeNoError(err)
@@ -272,7 +272,7 @@ func Test_encodeInterfaceOfInt8(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = int8(127)
+	var data any = int8(127)
 	var resultExpected = []byte("i127e")
 	result, err := encoder.encodeInterfaceOfInt8(data)
 	aTest.MustBeNoError(err)
@@ -290,7 +290,7 @@ func Test_encodeInterfaceOfInt16(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = int16(127)
+	var data any = int16(127)
 	var resultExpected = []byte("i127e")
 	result, err := encoder.encodeInterfaceOfInt16(data)
 	aTest.MustBeNoError(err)
@@ -308,7 +308,7 @@ func Test_encodeInterfaceOfInt32(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = int32(127)
+	var data any = int32(127)
 	var resultExpected = []byte("i127e")
 	result, err := encoder.encodeInterfaceOfInt32(data)
 	aTest.MustBeNoError(err)
@@ -326,7 +326,7 @@ func Test_encodeInterfaceOfInt64(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = int64(127)
+	var data any = int64(127)
 	var resultExpected = []byte("i127e")
 	result, err := encoder.encodeInterfaceOfInt64(data)
 	aTest.MustBeNoError(err)
@@ -344,7 +344,7 @@ func Test_encodeInterfaceOfList(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data = []interface{}{
+	var data = []any{
 		int8(123),
 		"Qwe",
 	}
@@ -354,7 +354,7 @@ func Test_encodeInterfaceOfList(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 
 	// Test #2. Negative.
-	data = []interface{}{
+	data = []any{
 		int8(123),
 		time.Time{},
 	}
@@ -368,7 +368,7 @@ func Test_encodeInterfaceOfSlice(t *testing.T) {
 
 	// Test #1. Slice of Bytes.
 	encoder := NewEncoder()
-	var data interface{} = []byte("ABC")
+	var data any = []byte("ABC")
 	var resultExpected = []byte("3:ABC")
 	result, err := encoder.encodeInterfaceOfSlice(data)
 	aTest.MustBeNoError(err)
@@ -389,7 +389,7 @@ func Test_encodeInterfaceOfSlice(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 
 	// Test #3. Slice of Interfaces.
-	data = []interface{}{
+	data = []any{
 		"Qwerty",
 		uint16(6565),
 	}
@@ -410,7 +410,7 @@ func Test_encodeInterfaceOfSliceOfBytes(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = []byte("Qwe")
+	var data any = []byte("Qwe")
 	var resultExpected = []byte("3:Qwe")
 	result, err := encoder.encodeInterfaceOfSliceOfBytes(data)
 	aTest.MustBeNoError(err)
@@ -428,7 +428,7 @@ func Test_encodeInterfaceOfString(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = "Abc"
+	var data any = "Abc"
 	var resultExpected = []byte("3:Abc")
 	result, err := encoder.encodeInterfaceOfString(data)
 	aTest.MustBeNoError(err)
@@ -446,7 +446,7 @@ func Test_encodeInterfaceOfUint(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = uint(123)
+	var data any = uint(123)
 	var resultExpected = []byte("i123e")
 	result, err := encoder.encodeInterfaceOfUint(data)
 	aTest.MustBeNoError(err)
@@ -464,7 +464,7 @@ func Test_encodeInterfaceOfUint8(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = uint8(123)
+	var data any = uint8(123)
 	var resultExpected = []byte("i123e")
 	result, err := encoder.encodeInterfaceOfUint8(data)
 	aTest.MustBeNoError(err)
@@ -482,7 +482,7 @@ func Test_encodeInterfaceOfUint16(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = uint16(123)
+	var data any = uint16(123)
 	var resultExpected = []byte("i123e")
 	result, err := encoder.encodeInterfaceOfUint16(data)
 	aTest.MustBeNoError(err)
@@ -500,7 +500,7 @@ func Test_encodeInterfaceOfUint32(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = uint32(123)
+	var data any = uint32(123)
 	var resultExpected = []byte("i123e")
 	result, err := encoder.encodeInterfaceOfUint32(data)
 	aTest.MustBeNoError(err)
@@ -518,7 +518,7 @@ func Test_encodeInterfaceOfUint64(t *testing.T) {
 
 	// Test #1. Positive.
 	encoder := NewEncoder()
-	var data interface{} = uint64(123)
+	var data any = uint64(123)
 	var resultExpected = []byte("i123e")
 	result, err := encoder.encodeInterfaceOfUint64(data)
 	aTest.MustBeNoError(err)

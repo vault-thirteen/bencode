@@ -9,7 +9,6 @@ import (
 )
 
 func Test_CalculateBtih(t *testing.T) {
-
 	var aTest = tester.New(t)
 	var err error
 
@@ -52,9 +51,8 @@ func Test_CalculateBtih(t *testing.T) {
 }
 
 func Test_GetInfoSection(t *testing.T) {
-
 	var aTest = tester.New(t)
-	var output interface{}
+	var output any
 	var err error
 
 	// Test #1.
@@ -82,7 +80,7 @@ func Test_GetInfoSection(t *testing.T) {
 			},
 		},
 	}
-	var outputExpected interface{} = int16(101)
+	var outputExpected any = int16(101)
 	//
 	output, err = input.GetInfoSection()
 	//
@@ -115,7 +113,6 @@ func Test_GetInfoSection(t *testing.T) {
 }
 
 func Test_MakeSelfCheck(t *testing.T) {
-
 	var aTest = tester.New(t)
 
 	// Test #1.
@@ -173,7 +170,6 @@ func Test_MakeSelfCheck(t *testing.T) {
 }
 
 func Test_CalculateSha1(t *testing.T) {
-
 	const (
 		Data        string = "Just a Test."
 		HashSumText string = "7b708ef0a8efed41f005c67546a9467bf612a145"

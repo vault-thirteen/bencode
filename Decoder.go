@@ -9,10 +9,11 @@ import (
 //	1.	Parser's settings.
 
 //	1.1.	Integer size (number of ASCII letters allowed).
+//
 // N.B.: Maximum value of UInt64 is '18446744073709551615'.
 const IntegerMaxLength = 20
 
-//	1.2.	Byte string size header length (number of ASCII letters allowed).
+// 1.2.	Byte string size header length (number of ASCII letters allowed).
 const ByteStringSizeHeaderMaxLength = IntegerMaxLength
 
 // Decoder is a 'bencode' decoder.
@@ -21,9 +22,7 @@ type Decoder struct {
 }
 
 // NewDecoder is the decoder's constructor.
-func NewDecoder(
-	reader *bufio.Reader,
-) (d *Decoder) {
+func NewDecoder(reader *bufio.Reader) (d *Decoder) {
 	d = &Decoder{
 		reader: reader,
 	}
@@ -32,12 +31,12 @@ func NewDecoder(
 }
 
 // Decode decodes a 'bencoded' byte stream into an interface.
-func (d Decoder) Decode() (result interface{}, err error) {
+func (d Decoder) Decode() (result any, err error) {
 	return d.readBencodedValue()
 }
 
 // readBencodedValue reads a raw "bencoded" value, including its sub-values.
-func (d Decoder) readBencodedValue() (result interface{}, err error) {
+func (d Decoder) readBencodedValue() (result any, err error) {
 
 	// Get the first byte from stream to know its type.
 	var b byte
@@ -142,10 +141,7 @@ func (d Decoder) readByteStringSizeHeader() (byteStringLen uint, err error) {
 			// The length header is too big !
 			var errorArea = append(sizeHeader, []byte{b}...)
 
-			return 0, fmt.Errorf(
-				ErrHeaderLengthError,
-				errorArea,
-			)
+			return 0, fmt.Errorf(ErrHeaderLength, errorArea)
 		}
 
 		// Read the next byte.
@@ -174,7 +170,7 @@ func (d Decoder) readByteStringSizeHeader() (byteStringLen uint, err error) {
 
 // readDictionary reads a dictionary. We suppose that the header of the
 // dictionary ('d') has already been read from the stream.
-func (d Decoder) readDictionary() (result interface{}, err error) {
+func (d Decoder) readDictionary() (result any, err error) {
 
 	// Prepare the data.
 	var dictionary = make([]DictionaryItem, 0)
@@ -203,7 +199,7 @@ func (d Decoder) readDictionary() (result interface{}, err error) {
 		}
 
 		// Get the value.
-		var dictValue interface{}
+		var dictValue any
 		dictValue, err = d.readDictionaryValue()
 		if err != nil {
 			return nil, err
@@ -239,7 +235,7 @@ func (d Decoder) readDictionaryKey() ([]byte, error) {
 }
 
 // readDictionaryValue reads a dictionary's value.
-func (d Decoder) readDictionaryValue() (interface{}, error) {
+func (d Decoder) readDictionaryValue() (any, error) {
 	return d.readBencodedValue()
 }
 
@@ -273,7 +269,7 @@ func (d Decoder) readInteger() (value int64, err error) {
 			// The integer is too big !
 			var errorArea = append(valueBA, []byte{b}...)
 
-			return 0, fmt.Errorf(ErrFIntegerLengthError, errorArea)
+			return 0, fmt.Errorf(ErrFIntegerLength, errorArea)
 		}
 
 		// Read the next byte.
@@ -297,10 +293,10 @@ func (d Decoder) readInteger() (value int64, err error) {
 
 // readList reads a list from the stream (reader). We suppose that the header
 // of the list ('l') has already been read from the stream.
-func (d Decoder) readList() (list []interface{}, err error) {
+func (d Decoder) readList() (list []any, err error) {
 
 	// Prepare the data.
-	list = make([]interface{}, 0)
+	list = make([]any, 0)
 
 	// Probe the next byte to check the end of the list.
 	var b byte
@@ -319,7 +315,7 @@ func (d Decoder) readList() (list []interface{}, err error) {
 		}
 
 		// Get the item.
-		var listItem interface{}
+		var listItem any
 		listItem, err = d.readBencodedValue()
 		if err != nil {
 			return nil, err

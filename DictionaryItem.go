@@ -4,7 +4,7 @@ package bencode
 type DictionaryItem struct {
 	// System Fields.
 	Key   []byte
-	Value interface{}
+	Value any
 
 	// Additional Fields for special purposes.
 	KeyStr   string
