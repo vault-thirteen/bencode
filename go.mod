@@ -1,10 +1,10 @@
 module github.com/neverwinter-nights/bencode
 
-go 1.19
+go 1.20
 
 require (
-	github.com/vault-thirteen/errorz v1.1.0
-	github.com/vault-thirteen/tester v1.1.0
+	github.com/vault-thirteen/errorz v1.2.0
+	github.com/vault-thirteen/tester v1.2.0
 )
 
 require (
