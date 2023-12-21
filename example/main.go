@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/neverwinter-nights/bencode"
+	"github.com/vault-thirteen/bencode"
 )
 
 func main() {

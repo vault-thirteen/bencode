@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/vault-thirteen/errorz"
+	ae "github.com/vault-thirteen/auxie/errors"
 )
 
 // File is a file.
@@ -75,7 +75,7 @@ func (f *File) Parse() (result *DecodedObject, err error) {
 		// Close the file.
 		derr := f.close()
 		if derr != nil {
-			err = errorz.Combine(err, derr)
+			err = ae.Combine(err, derr)
 		}
 	}()
 

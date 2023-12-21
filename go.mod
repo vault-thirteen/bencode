@@ -1,11 +1,8 @@
-module github.com/neverwinter-nights/bencode
+module github.com/vault-thirteen/bencode
 
 go 1.20
 
-require (
-	github.com/vault-thirteen/errorz v1.2.0
-	github.com/vault-thirteen/tester v1.2.0
-)
+require github.com/vault-thirteen/auxie v0.18.1
 
 require (
 	github.com/kr/pretty v0.3.1 // indirect
