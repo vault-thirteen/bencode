@@ -8,7 +8,17 @@ import (
 	"github.com/vault-thirteen/auxie/tester"
 )
 
-func Test_addPostfixOfDictionary(t *testing.T) {
+func Test_NewEncoder(t *testing.T) {
+	var aTest = tester.New(t)
+
+	var encoder = NewEncoder()
+	aTest.MustBeEqual(encoder.commonPostfix, []byte{'e'})
+	aTest.MustBeEqual(encoder.dictionaryPrefix, []byte{'d'})
+	aTest.MustBeEqual(encoder.integerPrefix, []byte{'i'})
+	aTest.MustBeEqual(encoder.listPrefix, []byte{'l'})
+}
+
+func Test_Encoder_addPostfixOfDictionary(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -19,7 +29,7 @@ func Test_addPostfixOfDictionary(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_addPostfixOfList(t *testing.T) {
+func Test_Encoder_addPostfixOfList(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -30,7 +40,7 @@ func Test_addPostfixOfList(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_addPrefixAndPostfixOfByteString(t *testing.T) {
+func Test_Encoder_addPrefixAndPostfixOfByteString(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -41,7 +51,7 @@ func Test_addPrefixAndPostfixOfByteString(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_addPrefixAndPostfixOfInteger(t *testing.T) {
+func Test_Encoder_addPrefixAndPostfixOfInteger(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -52,7 +62,7 @@ func Test_addPrefixAndPostfixOfInteger(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_addPrefixOfDictionary(t *testing.T) {
+func Test_Encoder_addPrefixOfDictionary(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -63,7 +73,7 @@ func Test_addPrefixOfDictionary(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_addPrefixOfList(t *testing.T) {
+func Test_Encoder_addPrefixOfList(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -74,7 +84,7 @@ func Test_addPrefixOfList(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_createSizePrefix(t *testing.T) {
+func Test_Encoder_createSizePrefix(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -84,7 +94,7 @@ func Test_createSizePrefix(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_createTextFromInteger(t *testing.T) {
+func Test_Encoder_createTextFromInteger(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -94,7 +104,7 @@ func Test_createTextFromInteger(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_createTextFromUInteger(t *testing.T) {
+func Test_Encoder_createTextFromUInteger(t *testing.T) {
 
 	var aTest = tester.New(t)
 
@@ -104,7 +114,7 @@ func Test_createTextFromUInteger(t *testing.T) {
 	aTest.MustBeEqual(result, resultExpected)
 }
 
-func Test_EncodeAnInterface(t *testing.T) {
+func Test_Encoder_EncodeAnInterface(t *testing.T) {
 
 	type TestData struct {
 		dataToBeEncoded any
@@ -210,322 +220,476 @@ func Test_EncodeAnInterface(t *testing.T) {
 	}
 }
 
-func Test_encodeDictionary(t *testing.T) {
+func Test_Encoder_encodeDictionary(t *testing.T) {
 
 	var aTest = tester.New(t)
+
+	var encoder *Encoder
+	var dictionary []DictionaryItem
+	var result []byte
+	var resultExpected []byte
+	var err error
 
 	// Test #1.
-	encoder := NewEncoder()
-	var dictionary = []DictionaryItem{
-		{
-			Key:      []byte("Aa"),
-			Value:    123,
-			KeyStr:   "Aa",
-			ValueStr: "123",
-		},
-		{
-			Key:      []byte("Bb"),
-			Value:    "QWERTY",
-			KeyStr:   "Bb",
-			ValueStr: "QWERTY",
-		},
+	{
+		encoder = NewEncoder()
+		dictionary = []DictionaryItem{
+			{
+				Key:      []byte("Aa"),
+				Value:    123,
+				KeyStr:   "Aa",
+				ValueStr: "123",
+			},
+			{
+				Key:      []byte("Bb"),
+				Value:    "QWERTY",
+				KeyStr:   "Bb",
+				ValueStr: "QWERTY",
+			},
+		}
+		resultExpected = []byte("d2:Aai123e2:Bb6:QWERTYe")
+		result, err = encoder.encodeDictionary(dictionary)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
 	}
-	var resultExpected = []byte("d2:Aai123e2:Bb6:QWERTYe")
-	result, err := encoder.encodeDictionary(dictionary)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
 
 	// Test #2. Negative.
-	dictionary = []DictionaryItem{
-		{
-			Key:      []byte("Aa"),
-			Value:    time.Time{},
-			KeyStr:   "Aa",
-			ValueStr: "123",
-		},
+	{
+		dictionary = []DictionaryItem{
+			{
+				Key:      []byte("Aa"),
+				Value:    time.Time{},
+				KeyStr:   "Aa",
+				ValueStr: "123",
+			},
+		}
+		result, err = encoder.encodeDictionary(dictionary)
+		aTest.MustBeAnError(err)
 	}
-	result, err = encoder.encodeDictionary(dictionary)
-	aTest.MustBeAnError(err)
 }
 
-func Test_encodeInterfaceOfInt(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfInt(t *testing.T) {
 
 	var aTest = tester.New(t)
 
-	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = 123
-	var resultExpected = []byte("i123e")
-	result, err := encoder.encodeInterfaceOfInt(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
-
-	// Test #2. Negative.
-	data = uint(123)
-	result, err = encoder.encodeInterfaceOfInt(data)
-	aTest.MustBeAnError(err)
-}
-
-func Test_encodeInterfaceOfInt8(t *testing.T) {
-
-	var aTest = tester.New(t)
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
 
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = int8(127)
-	var resultExpected = []byte("i127e")
-	result, err := encoder.encodeInterfaceOfInt8(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
-
-	// Test #2. Negative.
-	data = "qqq"
-	result, err = encoder.encodeInterfaceOfInt8(data)
-	aTest.MustBeAnError(err)
-}
-
-func Test_encodeInterfaceOfInt16(t *testing.T) {
-
-	var aTest = tester.New(t)
-
-	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = int16(127)
-	var resultExpected = []byte("i127e")
-	result, err := encoder.encodeInterfaceOfInt16(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
-
-	// Test #2. Negative.
-	data = "qqq"
-	result, err = encoder.encodeInterfaceOfInt16(data)
-	aTest.MustBeAnError(err)
-}
-
-func Test_encodeInterfaceOfInt32(t *testing.T) {
-
-	var aTest = tester.New(t)
-
-	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = int32(127)
-	var resultExpected = []byte("i127e")
-	result, err := encoder.encodeInterfaceOfInt32(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
-
-	// Test #2. Negative.
-	data = "qqq"
-	result, err = encoder.encodeInterfaceOfInt32(data)
-	aTest.MustBeAnError(err)
-}
-
-func Test_encodeInterfaceOfInt64(t *testing.T) {
-
-	var aTest = tester.New(t)
-
-	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = int64(127)
-	var resultExpected = []byte("i127e")
-	result, err := encoder.encodeInterfaceOfInt64(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
-
-	// Test #2. Negative.
-	data = "qqq"
-	result, err = encoder.encodeInterfaceOfInt64(data)
-	aTest.MustBeAnError(err)
-}
-
-func Test_encodeInterfaceOfList(t *testing.T) {
-
-	var aTest = tester.New(t)
-
-	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data = []any{
-		int8(123),
-		"Qwe",
+	{
+		encoder = NewEncoder()
+		data = 123
+		resultExpected = []byte("i123e")
+		result, err = encoder.encodeInterfaceOfInt(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
 	}
-	var resultExpected = []byte("li123e3:Qwee")
-	result, err := encoder.encodeInterfaceOfList(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
 
 	// Test #2. Negative.
-	data = []any{
-		int8(123),
-		time.Time{},
+	{
+		data = uint(123)
+		result, err = encoder.encodeInterfaceOfInt(data)
+		aTest.MustBeAnError(err)
 	}
-	result, err = encoder.encodeInterfaceOfList(data)
-	aTest.MustBeAnError(err)
 }
 
-func Test_encodeInterfaceOfSlice(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfInt8(t *testing.T) {
 
 	var aTest = tester.New(t)
+
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
+	// Test #1. Positive.
+	{
+		encoder = NewEncoder()
+		data = int8(127)
+		resultExpected = []byte("i127e")
+		result, err = encoder.encodeInterfaceOfInt8(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
+
+	// Test #2. Negative.
+	{
+		data = "qqq"
+		result, err = encoder.encodeInterfaceOfInt8(data)
+		aTest.MustBeAnError(err)
+	}
+}
+
+func Test_Encoder_encodeInterfaceOfInt16(t *testing.T) {
+
+	var aTest = tester.New(t)
+
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
+	// Test #1. Positive.
+	{
+		encoder = NewEncoder()
+		data = int16(127)
+		resultExpected = []byte("i127e")
+		result, err = encoder.encodeInterfaceOfInt16(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
+
+	// Test #2. Negative.
+	{
+		data = "qqq"
+		result, err = encoder.encodeInterfaceOfInt16(data)
+		aTest.MustBeAnError(err)
+	}
+}
+
+func Test_Encoder_encodeInterfaceOfInt32(t *testing.T) {
+
+	var aTest = tester.New(t)
+
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
+	// Test #1. Positive.
+	{
+		encoder = NewEncoder()
+		data = int32(127)
+		resultExpected = []byte("i127e")
+		result, err = encoder.encodeInterfaceOfInt32(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
+
+	// Test #2. Negative.
+	{
+		data = "qqq"
+		result, err = encoder.encodeInterfaceOfInt32(data)
+		aTest.MustBeAnError(err)
+	}
+}
+
+func Test_Encoder_encodeInterfaceOfInt64(t *testing.T) {
+
+	var aTest = tester.New(t)
+
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
+	// Test #1. Positive.
+	{
+		encoder = NewEncoder()
+		data = int64(127)
+		resultExpected = []byte("i127e")
+		result, err = encoder.encodeInterfaceOfInt64(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
+
+	// Test #2. Negative.
+	{
+		data = "qqq"
+		result, err = encoder.encodeInterfaceOfInt64(data)
+		aTest.MustBeAnError(err)
+	}
+}
+
+func Test_Encoder_encodeInterfaceOfList(t *testing.T) {
+
+	var aTest = tester.New(t)
+
+	var encoder *Encoder
+	var data []any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
+	// Test #1. Positive.
+	{
+		encoder = NewEncoder()
+		data = []any{
+			int8(123),
+			"Qwe",
+		}
+		resultExpected = []byte("li123e3:Qwee")
+		result, err = encoder.encodeInterfaceOfList(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
+
+	// Test #2. Negative.
+	{
+		data = []any{
+			int8(123),
+			time.Time{},
+		}
+		result, err = encoder.encodeInterfaceOfList(data)
+		aTest.MustBeAnError(err)
+	}
+}
+
+func Test_Encoder_encodeInterfaceOfSlice(t *testing.T) {
+
+	var aTest = tester.New(t)
+
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
 
 	// Test #1. Slice of Bytes.
-	encoder := NewEncoder()
-	var data any = []byte("ABC")
-	var resultExpected = []byte("3:ABC")
-	result, err := encoder.encodeInterfaceOfSlice(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
-
-	// Test #2. Dictionary
-	data = []DictionaryItem{
-		{
-			Key:      []byte("Aa"),
-			Value:    123,
-			KeyStr:   "Aa",
-			ValueStr: "123",
-		},
+	{
+		encoder = NewEncoder()
+		data = []byte("ABC")
+		resultExpected = []byte("3:ABC")
+		result, err = encoder.encodeInterfaceOfSlice(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
 	}
-	resultExpected = []byte("d2:Aai123ee")
-	result, err = encoder.encodeInterfaceOfSlice(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+
+	// Test #2. Dictionary.
+	{
+		data = []DictionaryItem{
+			{
+				Key:      []byte("Aa"),
+				Value:    123,
+				KeyStr:   "Aa",
+				ValueStr: "123",
+			},
+		}
+		resultExpected = []byte("d2:Aai123ee")
+		result, err = encoder.encodeInterfaceOfSlice(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #3. Slice of Interfaces.
-	data = []any{
-		"Qwerty",
-		uint16(6565),
+	{
+		data = []any{
+			"Qwerty",
+			uint16(6565),
+		}
+		resultExpected = []byte("l6:Qwertyi6565ee")
+		result, err = encoder.encodeInterfaceOfSlice(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
 	}
-	resultExpected = []byte("l6:Qwertyi6565ee")
-	result, err = encoder.encodeInterfaceOfSlice(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
 
 	// Test #4. unknown Type.
-	data = []time.Time{}
-	result, err = encoder.encodeInterfaceOfSlice(data)
-	aTest.MustBeAnError(err)
+	{
+		data = []time.Time{}
+		result, err = encoder.encodeInterfaceOfSlice(data)
+		aTest.MustBeAnError(err)
+	}
 }
 
-func Test_encodeInterfaceOfSliceOfBytes(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfSliceOfBytes(t *testing.T) {
 
 	var aTest = tester.New(t)
 
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = []byte("Qwe")
-	var resultExpected = []byte("3:Qwe")
-	result, err := encoder.encodeInterfaceOfSliceOfBytes(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+	{
+		encoder = NewEncoder()
+		data = []byte("Qwe")
+		resultExpected = []byte("3:Qwe")
+		result, err = encoder.encodeInterfaceOfSliceOfBytes(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #2. Negative.
-	data = 123
-	result, err = encoder.encodeInterfaceOfSliceOfBytes(data)
-	aTest.MustBeAnError(err)
+	{
+		data = 123
+		result, err = encoder.encodeInterfaceOfSliceOfBytes(data)
+		aTest.MustBeAnError(err)
+	}
 }
 
-func Test_encodeInterfaceOfString(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfString(t *testing.T) {
 
 	var aTest = tester.New(t)
 
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = "Abc"
-	var resultExpected = []byte("3:Abc")
-	result, err := encoder.encodeInterfaceOfString(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+	{
+		encoder = NewEncoder()
+		data = "Abc"
+		resultExpected = []byte("3:Abc")
+		result, err = encoder.encodeInterfaceOfString(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #2. Negative.
-	data = 123
-	result, err = encoder.encodeInterfaceOfString(data)
-	aTest.MustBeAnError(err)
+	{
+		data = 123
+		result, err = encoder.encodeInterfaceOfString(data)
+		aTest.MustBeAnError(err)
+	}
 }
 
-func Test_encodeInterfaceOfUint(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfUint(t *testing.T) {
 
 	var aTest = tester.New(t)
 
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = uint(123)
-	var resultExpected = []byte("i123e")
-	result, err := encoder.encodeInterfaceOfUint(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+	{
+		encoder = NewEncoder()
+		data = uint(123)
+		resultExpected = []byte("i123e")
+		result, err = encoder.encodeInterfaceOfUint(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #2. Negative.
-	data = "x"
-	result, err = encoder.encodeInterfaceOfUint(data)
-	aTest.MustBeAnError(err)
+	{
+		data = "x"
+		result, err = encoder.encodeInterfaceOfUint(data)
+		aTest.MustBeAnError(err)
+	}
 }
 
-func Test_encodeInterfaceOfUint8(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfUint8(t *testing.T) {
 
 	var aTest = tester.New(t)
 
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = uint8(123)
-	var resultExpected = []byte("i123e")
-	result, err := encoder.encodeInterfaceOfUint8(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+	{
+		encoder = NewEncoder()
+		data = uint8(123)
+		resultExpected = []byte("i123e")
+		result, err = encoder.encodeInterfaceOfUint8(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #2. Negative.
-	data = "x"
-	result, err = encoder.encodeInterfaceOfUint8(data)
-	aTest.MustBeAnError(err)
+	{
+		data = "x"
+		result, err = encoder.encodeInterfaceOfUint8(data)
+		aTest.MustBeAnError(err)
+	}
 }
 
-func Test_encodeInterfaceOfUint16(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfUint16(t *testing.T) {
 
 	var aTest = tester.New(t)
 
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = uint16(123)
-	var resultExpected = []byte("i123e")
-	result, err := encoder.encodeInterfaceOfUint16(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+	{
+		encoder = NewEncoder()
+		data = uint16(123)
+		resultExpected = []byte("i123e")
+		result, err = encoder.encodeInterfaceOfUint16(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #2. Negative.
-	data = "x"
-	result, err = encoder.encodeInterfaceOfUint16(data)
-	aTest.MustBeAnError(err)
+	{
+		data = "x"
+		result, err = encoder.encodeInterfaceOfUint16(data)
+		aTest.MustBeAnError(err)
+	}
 }
 
-func Test_encodeInterfaceOfUint32(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfUint32(t *testing.T) {
 
 	var aTest = tester.New(t)
 
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = uint32(123)
-	var resultExpected = []byte("i123e")
-	result, err := encoder.encodeInterfaceOfUint32(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+	{
+		encoder = NewEncoder()
+		data = uint32(123)
+		resultExpected = []byte("i123e")
+		result, err = encoder.encodeInterfaceOfUint32(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #2. Negative.
-	data = "x"
-	result, err = encoder.encodeInterfaceOfUint32(data)
-	aTest.MustBeAnError(err)
+	{
+		data = "x"
+		result, err = encoder.encodeInterfaceOfUint32(data)
+		aTest.MustBeAnError(err)
+	}
 }
 
-func Test_encodeInterfaceOfUint64(t *testing.T) {
+func Test_Encoder_encodeInterfaceOfUint64(t *testing.T) {
 
 	var aTest = tester.New(t)
 
+	var encoder *Encoder
+	var data any
+	var result []byte
+	var resultExpected []byte
+	var err error
+
 	// Test #1. Positive.
-	encoder := NewEncoder()
-	var data any = uint64(123)
-	var resultExpected = []byte("i123e")
-	result, err := encoder.encodeInterfaceOfUint64(data)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, resultExpected)
+	{
+		encoder = NewEncoder()
+		data = uint64(123)
+		resultExpected = []byte("i123e")
+		result, err = encoder.encodeInterfaceOfUint64(data)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, resultExpected)
+	}
 
 	// Test #2. Negative.
-	data = "x"
-	result, err = encoder.encodeInterfaceOfUint64(data)
-	aTest.MustBeAnError(err)
+	{
+		data = "x"
+		result, err = encoder.encodeInterfaceOfUint64(data)
+		aTest.MustBeAnError(err)
+	}
 }

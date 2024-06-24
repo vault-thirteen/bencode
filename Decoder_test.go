@@ -9,11 +9,20 @@ import (
 	"github.com/vault-thirteen/auxie/tester"
 )
 
-func Test_Decode(t *testing.T) {
+func Test_NewDecoder(t *testing.T) {
+
+	var aTest = tester.New(t)
+
+	var reader = bufio.NewReader(strings.NewReader(""))
+	var decoder = NewDecoder(reader)
+	aTest.MustBeEqual(decoder.reader, reader)
+}
+
+func Test_Decoder_Decode(t *testing.T) {
 	// See Test_readBencodedValue.
 }
 
-func Test_readBencodedValue(t *testing.T) {
+func Test_Decoder_readBencodedValue(t *testing.T) {
 
 	type TestData struct {
 		reader          *bufio.Reader
@@ -115,7 +124,7 @@ func Test_readBencodedValue(t *testing.T) {
 	}
 }
 
-func Test_readByteString(t *testing.T) {
+func Test_Decoder_readByteString(t *testing.T) {
 
 	type TestData struct {
 		reader          *bufio.Reader
@@ -174,7 +183,7 @@ func Test_readByteString(t *testing.T) {
 	}
 }
 
-func Test_readByteStringSizeHeader(t *testing.T) {
+func Test_Decoder_readByteStringSizeHeader(t *testing.T) {
 
 	type TestData struct {
 		reader          *bufio.Reader
@@ -265,7 +274,7 @@ func Test_readByteStringSizeHeader(t *testing.T) {
 	}
 }
 
-func Test_readDictionary(t *testing.T) {
+func Test_Decoder_readDictionary(t *testing.T) {
 
 	type TestData struct {
 		reader          *bufio.Reader
@@ -357,15 +366,15 @@ func Test_readDictionary(t *testing.T) {
 	}
 }
 
-func Test_readDictionaryKey(t *testing.T) {
+func Test_Decoder_readDictionaryKey(t *testing.T) {
 	// See Test_readByteString.
 }
 
-func Test_readDictionaryValue(t *testing.T) {
+func Test_Decoder_readDictionaryValue(t *testing.T) {
 	// See Test_readBencodedValue.
 }
 
-func Test_readInteger(t *testing.T) {
+func Test_Decoder_readInteger(t *testing.T) {
 
 	type TestData struct {
 		reader          *bufio.Reader
@@ -464,7 +473,7 @@ func Test_readInteger(t *testing.T) {
 	}
 }
 
-func Test_readList(t *testing.T) {
+func Test_Decoder_readList(t *testing.T) {
 
 	type TestData struct {
 		reader          *bufio.Reader

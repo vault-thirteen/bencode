@@ -17,6 +17,7 @@ const (
 	TestFileAContents = "Test Contents."
 	TestFileBName     = "file-b.txt"
 	TestFileBContents = "d4:info3:Sune"
+	TestFileCName     = "file-c.txt"
 )
 
 func createTestFolder(t *testing.T) {
@@ -69,7 +70,14 @@ func createTestFileB(t *testing.T) {
 	aTest.MustBeNoError(err)
 }
 
-func Test_getContents(t *testing.T) {
+func Test_NewFile(t *testing.T) {
+	var aTest = tester.New(t)
+
+	var file = NewFile("file_path")
+	aTest.MustBeEqual(file.path, "file_path")
+}
+
+func Test_File_getContents(t *testing.T) {
 	var aTest = tester.New(t)
 
 	// Test Initialization.
@@ -83,32 +91,75 @@ func Test_getContents(t *testing.T) {
 		deleteTestFolder(t)
 	}()
 
-	// Open the File.
+	var fileContents []byte
 	var err error
-	err = f.open()
-	aTest.MustBeNoError(err)
 
 	// Test #1. Positive.
-	var fileContents []byte
-	fileContents, err = f.getContents()
+	{
+		// Open the File.
+		err = f.open()
+		aTest.MustBeNoError(err)
 
-	// Results Inspection.
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(fileContents, []byte(TestFileAContents))
+		fileContents, err = f.getContents()
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(fileContents, []byte(TestFileAContents))
 
-	// Close the File.
-	err = f.close()
-	aTest.MustBeNoError(err)
+		// Close the File.
+		err = f.close()
+		aTest.MustBeNoError(err)
+	}
 
 	// Test #2. Negative.
-	fOsFileOriginalValue := f.osFile
-	f.osFile = nil
-	fileContents, err = f.getContents()
-	aTest.MustBeAnError(err)
-	f.osFile = fOsFileOriginalValue
+	{
+		fOsFileOriginalValue := f.osFile
+		f.osFile = nil
+		fileContents, err = f.getContents()
+		aTest.MustBeAnError(err)
+		f.osFile = fOsFileOriginalValue
+	}
 }
 
-func Test_Parse(t *testing.T) {
+func Test_File_open(t *testing.T) {
+	var aTest = tester.New(t)
+
+	// Test Initialization.
+	createTestFolder(t)
+	createTestFileA(t)
+
+	// Test Finalization.
+	defer func() {
+		deleteTestFolder(t)
+	}()
+
+	var f *File
+	var err error
+
+	// Test #1. Positive.
+	{
+		filePath := filepath.Join(TestFolder, TestFileAName)
+		f = NewFile(filePath)
+
+		// Open the File.
+		err = f.open()
+		aTest.MustBeNoError(err)
+
+		// Close the File.
+		err = f.close()
+		aTest.MustBeNoError(err)
+	}
+
+	// Test #2. Negative.
+	{
+		filePath := filepath.Join(TestFolder, TestFileCName)
+		f = NewFile(filePath)
+
+		// Open the File.
+		err = f.open()
+		aTest.MustBeAnError(err)
+	}
+}
+
+func Test_File_Parse(t *testing.T) {
 	var aTest = tester.New(t)
 	var err error
 

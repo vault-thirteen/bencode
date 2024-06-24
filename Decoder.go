@@ -23,11 +23,9 @@ type Decoder struct {
 
 // NewDecoder is the decoder's constructor.
 func NewDecoder(reader *bufio.Reader) (d *Decoder) {
-	d = &Decoder{
+	return &Decoder{
 		reader: reader,
 	}
-
-	return d
 }
 
 // Decode decodes a 'bencoded' byte stream into an interface.

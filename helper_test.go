@@ -9,54 +9,73 @@ import (
 func Test_convertByteStringToInteger(t *testing.T) {
 	var aTest = tester.New(t)
 
-	// Test #1. Negative.
-	var bytes = []byte("123456789012345678912345")
+	var bytes []byte
 	var result int64
 	var err error
-	result, err = convertByteStringToInteger(bytes)
-	aTest.MustBeAnError(err)
-	aTest.MustBeEqual(result, int64(0))
+
+	// Test #1. Negative.
+	{
+		bytes = []byte("123456789012345678912345")
+		result, err = convertByteStringToInteger(bytes)
+		aTest.MustBeAnError(err)
+		aTest.MustBeEqual(result, int64(0))
+	}
 
 	// Test #2. Positive.
-	bytes = []byte("-12345")
-	result, err = convertByteStringToInteger(bytes)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, int64(-12345))
+	{
+		bytes = []byte("-12345")
+		result, err = convertByteStringToInteger(bytes)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, int64(-12345))
+	}
 }
 
 func Test_convertByteStringToNonNegativeInteger(t *testing.T) {
 	var aTest = tester.New(t)
 
-	// Test #1. Negative.
-	var bytes = []byte("123456789012345678912345")
+	var bytes []byte
 	var result uint64
 	var err error
-	result, err = convertByteStringToNonNegativeInteger(bytes)
-	aTest.MustBeAnError(err)
-	aTest.MustBeEqual(result, uint64(0))
+
+	// Test #1. Negative.
+	{
+		bytes = []byte("123456789012345678912345")
+		result, err = convertByteStringToNonNegativeInteger(bytes)
+		aTest.MustBeAnError(err)
+		aTest.MustBeEqual(result, uint64(0))
+	}
 
 	// Test #2. Positive.
-	bytes = []byte("12345")
-	result, err = convertByteStringToNonNegativeInteger(bytes)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(result, uint64(12345))
+	{
+		bytes = []byte("12345")
+		result, err = convertByteStringToNonNegativeInteger(bytes)
+		aTest.MustBeNoError(err)
+		aTest.MustBeEqual(result, uint64(12345))
+	}
 }
 
 func Test_convertInterfaceToString(t *testing.T) {
 	var aTest = tester.New(t)
 
-	// Test #1. Negative: Not a Slice.
 	var result string
-	result = convertInterfaceToString("Error")
-	aTest.MustBeEqual(result, "")
+
+	// Test #1. Negative: Not a Slice.
+	{
+		result = convertInterfaceToString("Error")
+		aTest.MustBeEqual(result, "")
+	}
 
 	// Test #2. Negative: Not a Slice of Bytes.
-	result = convertInterfaceToString([]rune("xyz"))
-	aTest.MustBeEqual(result, "")
+	{
+		result = convertInterfaceToString([]rune("xyz"))
+		aTest.MustBeEqual(result, "")
+	}
 
 	// Test #3. Positive.
-	result = convertInterfaceToString([]byte("Text"))
-	aTest.MustBeEqual(result, "Text")
+	{
+		result = convertInterfaceToString([]byte("Text"))
+		aTest.MustBeEqual(result, "Text")
+	}
 }
 
 func Test_isByteAsciiNumeric(t *testing.T) {
@@ -73,7 +92,7 @@ func Test_isByteAsciiNumeric(t *testing.T) {
 	aTest.MustBeEqual(isByteAsciiNumeric('8'), true)
 	aTest.MustBeEqual(isByteAsciiNumeric('9'), true)
 	aTest.MustBeEqual(isByteAsciiNumeric('-'), true)
-	//
+
 	aTest.MustBeEqual(isByteAsciiNumeric('x'), false)
 }
 
@@ -90,6 +109,6 @@ func Test_isByteNonNegativeAsciiNumeric(t *testing.T) {
 	aTest.MustBeEqual(isByteNonNegativeAsciiNumeric('7'), true)
 	aTest.MustBeEqual(isByteNonNegativeAsciiNumeric('8'), true)
 	aTest.MustBeEqual(isByteNonNegativeAsciiNumeric('9'), true)
-	//
+
 	aTest.MustBeEqual(isByteNonNegativeAsciiNumeric('x'), false)
 }

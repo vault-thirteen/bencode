@@ -44,8 +44,8 @@ func (do *DecodedObject) CalculateBtih() (err error) {
 	return nil
 }
 
-// GetInfoSection gets an 'info' section from the object.
-func (do *DecodedObject) GetInfoSection() (result any, err error) {
+// GetSection gets a section specified by its name from the object.
+func (do *DecodedObject) GetSection(sectionName string) (result any, err error) {
 
 	// Get the dictionary.
 	var dictionary []DictionaryItem
@@ -55,15 +55,20 @@ func (do *DecodedObject) GetInfoSection() (result any, err error) {
 		return nil, errors.New(ErrTypeAssertion)
 	}
 
-	// Get the 'info' section from the decoded object.
+	// Get the section from the decoded object.
 	var dictItem DictionaryItem
 	for _, dictItem = range dictionary {
-		if string(dictItem.Key) == FileSectionInfo {
+		if string(dictItem.Key) == sectionName {
 			return dictItem.Value, nil
 		}
 	}
 
 	return nil, errors.New(ErrSectionDoesNotExist)
+}
+
+// GetInfoSection gets an 'info' section from the object.
+func (do *DecodedObject) GetInfoSection() (result any, err error) {
+	return do.GetSection(FileSectionInfo)
 }
 
 // MakeSelfCheck performs a simple self-check. It encodes the decoded data and
