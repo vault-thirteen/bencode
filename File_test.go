@@ -177,9 +177,9 @@ func Test_File_Parse(t *testing.T) {
 	// Test #1. Positive.
 	var do *DecodedObject
 	do, err = f.Parse()
+	aTest.MustBeNoError(err)
+	aTest.MustBeDifferent(do, (*DecodedObject)(nil))
 
-	// Results Inspection.
-	aTest.MustBeDifferent(do, nil)
 	const Sha1SumTextExpected = "beb11253d7cbb2eed50ee54e33218dc1829345a7"
 	var doExpected = &DecodedObject{
 		FilePath:   filePath,
@@ -200,10 +200,10 @@ func Test_File_Parse(t *testing.T) {
 			Text:  Sha1SumTextExpected,
 		},
 	}
+
 	var ba []byte
 	ba, err = hex.DecodeString(Sha1SumTextExpected)
 	aTest.MustBeNoError(err)
 	copy(doExpected.BTIH.Bytes[:], ba)
-	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(do, doExpected)
 }
