@@ -12,9 +12,7 @@ protocol.
 
 Apart from the encoding and decoding data with the _Bencode_ format, this
 packages also provides some additional functionality, such as:
-- Automatic self-check after file decoding;
-- Automatic calculation of the _BitTorrent Info Hash_ (also known as
-  _BTIH_) after the file decoding.
+- Automatic self-check after file decoding.
 
 This package is focused on safety and reliability rather than speed.
 
