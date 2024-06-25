@@ -117,3 +117,8 @@ func (f *File) Parse(makeSelfCheck bool) (result *DecodedObject, err error) {
 
 	return decodedObject, nil
 }
+
+// GetPath returns the path.
+func (f *File) GetPath() (path string) {
+	return f.path
+}

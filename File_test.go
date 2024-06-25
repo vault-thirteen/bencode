@@ -224,3 +224,11 @@ func Test_File_Parse(t *testing.T) {
 		aTest.MustBeEqual(do, doExpected)
 	}
 }
+
+func Test_File_GetPath(t *testing.T) {
+	var aTest = tester.New(t)
+
+	// Test.
+	var f = NewFile("the_path")
+	aTest.MustBeEqual(f.GetPath(), "the_path")
+}
