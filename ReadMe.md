@@ -11,7 +11,7 @@ The _Bencode_ format was introduced with the appearance of the _BitTorrent_
 protocol.
 
 Apart from the encoding and decoding data with the _Bencode_ format, this
-packages also provides some additional functionality, such as:
+package also provides some additional functionality, such as:
 - Automatic self-check after file decoding.
 
 This package is focused on safety and reliability rather than speed.
