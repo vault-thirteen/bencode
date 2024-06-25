@@ -1,7 +1,6 @@
 package bencode
 
 import (
-	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -161,7 +160,6 @@ func Test_File_open(t *testing.T) {
 
 func Test_File_Parse(t *testing.T) {
 	var aTest = tester.New(t)
-	var err error
 
 	// Test Initialization.
 	createTestFolder(t)
@@ -174,36 +172,55 @@ func Test_File_Parse(t *testing.T) {
 		deleteTestFolder(t)
 	}()
 
-	// Test #1. Positive.
 	var do *DecodedObject
-	do, err = f.Parse()
-	aTest.MustBeNoError(err)
-	aTest.MustBeDifferent(do, (*DecodedObject)(nil))
+	var doExpected *DecodedObject
+	var err error
 
-	const Sha1SumTextExpected = "beb11253d7cbb2eed50ee54e33218dc1829345a7"
-	var doExpected = &DecodedObject{
-		FilePath:   filePath,
-		SourceData: []byte(TestFileBContents),
-		DecodedObject: []DictionaryItem{
-			{
-				Key:      []byte("info"),
-				Value:    []byte("Sun"),
-				KeyStr:   "info",
-				ValueStr: "Sun",
+	// Test #1. Positive without self-check.
+	{
+		do, err = f.Parse(false)
+		aTest.MustBeNoError(err)
+		aTest.MustBeDifferent(do, (*DecodedObject)(nil))
+
+		doExpected = &DecodedObject{
+			FilePath:   filePath,
+			SourceData: []byte(TestFileBContents),
+			RawObject: []DictionaryItem{
+				{
+					Key:      []byte("info"),
+					Value:    []byte("Sun"),
+					KeyStr:   "info",
+					ValueStr: "Sun",
+				},
 			},
-		},
-		DecodeTimestamp: do.DecodeTimestamp, // Synchronization with Test.
-		//
-		IsSelfChecked: true,
-		BTIH: BtihData{
-			Bytes: Sha1Sum{}, // See below.
-			Text:  Sha1SumTextExpected,
-		},
+			DecodeTimestamp: do.DecodeTimestamp, // Synchronization with Test.
+			//
+			IsSelfChecked: false,
+		}
+		aTest.MustBeEqual(do, doExpected)
 	}
 
-	var ba []byte
-	ba, err = hex.DecodeString(Sha1SumTextExpected)
-	aTest.MustBeNoError(err)
-	copy(doExpected.BTIH.Bytes[:], ba)
-	aTest.MustBeEqual(do, doExpected)
+	// Test #2. Positive with self-check.
+	{
+		do, err = f.Parse(true)
+		aTest.MustBeNoError(err)
+		aTest.MustBeDifferent(do, (*DecodedObject)(nil))
+
+		doExpected = &DecodedObject{
+			FilePath:   filePath,
+			SourceData: []byte(TestFileBContents),
+			RawObject: []DictionaryItem{
+				{
+					Key:      []byte("info"),
+					Value:    []byte("Sun"),
+					KeyStr:   "info",
+					ValueStr: "Sun",
+				},
+			},
+			DecodeTimestamp: do.DecodeTimestamp, // Synchronization with Test.
+			//
+			IsSelfChecked: true,
+		}
+		aTest.MustBeEqual(do, doExpected)
+	}
 }

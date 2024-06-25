@@ -9,11 +9,10 @@ import (
 func Test_format(t *testing.T) {
 	var aTest = tester.New(t)
 
-	aTest.MustBeEqual(FileSectionAnnounce, "announce")
-	aTest.MustBeEqual(FileSectionAnnounceList, "announce-list")
-	aTest.MustBeEqual(FileSectionCreationDate, "creation date")
-	aTest.MustBeEqual(FileSectionComment, "comment")
-	aTest.MustBeEqual(FileSectionCreatedBy, "created by")
-	aTest.MustBeEqual(FileSectionEncoding, "encoding")
-	aTest.MustBeEqual(FileSectionInfo, "info")
+	aTest.MustBeEqual(HeaderDictionary, byte('d'))
+	aTest.MustBeEqual(HeaderInteger, byte('i'))
+	aTest.MustBeEqual(HeaderList, byte('l'))
+	aTest.MustBeEqual(HeaderStringSizeValueDelimiter, byte(':'))
+
+	aTest.MustBeEqual(FooterCommon, byte('e'))
 }

@@ -1,74 +1,43 @@
 package main
 
 import (
-	"bytes"
-	"encoding/hex"
-	"errors"
 	"fmt"
+	"log"
 	"path/filepath"
 
 	"github.com/vault-thirteen/bencode"
 )
 
+// Settings.
+const (
+	ExampleFolder = "example"
+	DataFolder    = "data"
+	FileName      = "5942384.torrent"
+)
+
 func main() {
-	var err = checkFileHashSum()
-	checkError(err)
+	var err = decodeFile()
+	mustBeNoError(err)
 }
 
-func checkFileHashSum() (err error) {
-	// Settings.
-	const (
-		ExampleFolder = "example"
-		DataFolder    = "data"
-		Btih          = "9ddf6a9b17b624991b39f8afd2edc64f673350e3"
-		FileName      = "5942384.torrent"
-	)
+func mustBeNoError(err error) {
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+}
 
-	// Parse the file.
+func decodeFile() (err error) {
 	var f = bencode.NewFile(
 		filepath.Join(ExampleFolder, DataFolder, FileName),
 	)
 
 	var decodedObject *bencode.DecodedObject
-	decodedObject, err = f.Parse()
+	decodedObject, err = f.Parse(true)
 	if err != nil {
 		return err
 	}
 
-	// Check the BTIH.
-	var ok = (decodedObject.BTIH.Text == Btih)
-
-	var btihBytesExpected []byte
-	btihBytesExpected, err = hex.DecodeString(Btih)
-	if err != nil {
-		return err
-	}
-
-	ok = ok && (bytes.Equal(
-		decodedObject.BTIH.Bytes[:],
-		btihBytesExpected,
-	))
-
-	if !ok {
-		err = errors.New(fmt.Sprintf(
-			"BTIH Mismatch. Expected:%v. Got:%v.",
-			Btih,
-			decodedObject.BTIH.Text,
-		))
-
-		return err
-	}
+	fmt.Println(decodedObject.FilePath)
 
 	return nil
-}
-
-// checkError checks an error and prints the result to the std::out.
-func checkError(err error) {
-	if err != nil {
-		fmt.Println("Error.", err)
-
-		return
-	}
-
-	fmt.Println("OK")
 }

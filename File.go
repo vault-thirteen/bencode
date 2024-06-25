@@ -63,7 +63,9 @@ func (f *File) open() (err error) {
 
 // Parse parses an input file into an interface. It also stores some
 // additional data, all packed into an object.
-func (f *File) Parse() (result *DecodedObject, err error) {
+// If 'makeSelfCheck' flag is enabled, the self check is performed after
+// decoding.
+func (f *File) Parse(makeSelfCheck bool) (result *DecodedObject, err error) {
 
 	// Open the file and prepare a stream reader.
 	err = f.open()
@@ -101,21 +103,16 @@ func (f *File) Parse() (result *DecodedObject, err error) {
 	decodedObject = &DecodedObject{
 		FilePath:        f.path,
 		SourceData:      fileContents,
-		DecodedObject:   ifc,
+		RawObject:       ifc,
 		DecodeTimestamp: time.Now().Unix(),
 	}
 
-	// Perform a self-check.
-	var ok bool
-	ok = decodedObject.MakeSelfCheck()
-	if !ok {
-		return nil, errors.New(ErrSelfCheck)
-	}
-
-	// Calculate the BTIH.
-	err = decodedObject.CalculateBtih()
-	if err != nil {
-		return nil, err
+	// Perform a self-check if needed.
+	if makeSelfCheck {
+		ok := decodedObject.MakeSelfCheck()
+		if !ok {
+			return nil, errors.New(ErrSelfCheck)
+		}
 	}
 
 	return decodedObject, nil
